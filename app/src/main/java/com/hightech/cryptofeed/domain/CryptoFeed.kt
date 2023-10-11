@@ -1,3 +1,5 @@
+package com.hightech.cryptofeed.domain
+
 data class CryptoFeed(
     val coinInfo: CoinInfo,
     val raw: Raw
