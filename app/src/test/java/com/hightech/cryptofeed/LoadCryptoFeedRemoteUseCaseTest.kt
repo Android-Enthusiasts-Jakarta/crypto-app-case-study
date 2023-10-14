@@ -1,20 +1,10 @@
 package com.hightech.cryptofeed
 
+import com.hightech.cryptofeed.api.HttpClient
+import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-
-class LoadCryptoFeedRemoteUseCase constructor(
-    private val client: HttpClient
-) {
-    fun load() {
-        client.get()
-    }
-}
-
-interface HttpClient {
-    fun get()
-}
 
 class LoadCryptoFeedRemoteUseCaseTest {
 
