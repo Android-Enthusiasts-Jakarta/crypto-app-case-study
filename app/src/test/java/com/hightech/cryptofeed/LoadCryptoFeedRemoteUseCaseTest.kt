@@ -12,7 +12,7 @@ class LoadCryptoFeedRemoteUseCase {
 
 class HttpClient private constructor() {
     companion object {
-        var instance = HttpClient()
+        val instance = HttpClient()
     }
     var getCount = 0
 }
