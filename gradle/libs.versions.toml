@@ -13,6 +13,7 @@ compose-bom = "2023.03.00"
 coroutines = "1.7.3"
 
 mockkAndroid = "1.13.3"
+turbine = "1.0.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -37,6 +38,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 # Test Framework
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAndroid" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
