@@ -7,6 +7,8 @@ interface HttpClient {
     fun get(): Flow<Exception>
 }
 
+class ConnectivityException: Exception()
+
 class LoadCryptoFeedRemoteUseCase constructor(
     private val client: HttpClient
 ) {
