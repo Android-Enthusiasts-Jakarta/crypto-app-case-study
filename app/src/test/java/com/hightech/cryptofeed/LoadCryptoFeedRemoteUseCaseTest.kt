@@ -4,6 +4,9 @@ import app.cash.turbine.test
 import com.hightech.cryptofeed.api.Connectivity
 import com.hightech.cryptofeed.api.ConnectivityException
 import com.hightech.cryptofeed.api.HttpClient
+import com.hightech.cryptofeed.api.InvalidData
+import com.hightech.cryptofeed.api.InvalidDataException
+import com.hightech.cryptofeed.api.InvalidDataExecption
 import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
@@ -83,6 +86,24 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
         sut.load().test {
             assertEquals(Connectivity::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            client.get()
+        }
+
+        confirmVerified(client)
+    }
+
+    @Test
+    fun testLoadDeliversInvalidDataError() = runBlocking {
+        every {
+            client.get()
+        } returns flowOf(InvalidDataException())
+
+        sut.load().test {
+            assertEquals(InvalidData::class.java, awaitItem()::class.java)
             awaitComplete()
         }
 
