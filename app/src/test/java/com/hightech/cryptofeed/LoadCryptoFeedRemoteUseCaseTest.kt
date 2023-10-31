@@ -1,6 +1,8 @@
 package com.hightech.cryptofeed
 
 import app.cash.turbine.test
+import com.hightech.cryptofeed.api.BadRequest
+import com.hightech.cryptofeed.api.BadRequestException
 import com.hightech.cryptofeed.api.Connectivity
 import com.hightech.cryptofeed.api.ConnectivityException
 import com.hightech.cryptofeed.api.HttpClient
@@ -96,6 +98,18 @@ class LoadCryptoFeedRemoteUseCaseTest {
             sut = sut,
             receivedHttpClientResult = InvalidDataException(),
             expectedResult = InvalidData(),
+            exactly = 1,
+            confirmVerified = client
+        )
+    }
+
+    @Test
+    fun testLoadDeliversBadRequestError() {
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClientResult = BadRequestException(),
+            expectedResult = BadRequest(),
             exactly = 1,
             confirmVerified = client
         )
