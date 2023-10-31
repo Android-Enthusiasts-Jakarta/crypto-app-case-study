@@ -6,6 +6,8 @@ import com.hightech.cryptofeed.api.BadRequestException
 import com.hightech.cryptofeed.api.Connectivity
 import com.hightech.cryptofeed.api.ConnectivityException
 import com.hightech.cryptofeed.api.HttpClient
+import com.hightech.cryptofeed.api.InternalServerError
+import com.hightech.cryptofeed.api.InternalServerErrorException
 import com.hightech.cryptofeed.api.InvalidData
 import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
@@ -110,6 +112,18 @@ class LoadCryptoFeedRemoteUseCaseTest {
             sut = sut,
             receivedHttpClientResult = BadRequestException(),
             expectedResult = BadRequest(),
+            exactly = 1,
+            confirmVerified = client
+        )
+    }
+
+    @Test
+    fun testLoadDeliversInternalServerError() {
+        expect(
+            client = client,
+            sut = sut,
+            receivedHttpClientResult = InternalServerErrorException(),
+            expectedResult = InternalServerError(),
             exactly = 1,
             confirmVerified = client
         )
