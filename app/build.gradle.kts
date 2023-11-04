@@ -73,4 +73,5 @@ dependencies {
     testImplementation(libs.turbine)
 
     implementation(libs.retrofit)
+    implementation(libs.moshi.kotlin)
 }

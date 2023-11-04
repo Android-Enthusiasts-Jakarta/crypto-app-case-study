@@ -18,6 +18,8 @@ turbine = "1.0.0"
 # Http
 retrofit = "2.9.0"
 
+moshi = "1.14.0"
+
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -45,6 +47,8 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 # Http
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
