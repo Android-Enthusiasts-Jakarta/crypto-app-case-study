@@ -3,6 +3,7 @@ package com.hightech.cryptofeed
 import app.cash.turbine.test
 import com.hightech.cryptofeed.api.ConnectivityException
 import com.hightech.cryptofeed.api.CryptoFeedRetrofitHttpClient
+import com.hightech.cryptofeed.api.CryptoFeedService
 import com.hightech.cryptofeed.api.HttpClientResult
 import io.mockk.coEvery
 import io.mockk.coVerify
