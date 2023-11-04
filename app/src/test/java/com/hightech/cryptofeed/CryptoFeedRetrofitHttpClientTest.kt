@@ -32,51 +32,53 @@ class CryptoFeedRetrofitHttpClientTest {
 
     @Test
     fun testGetFailsOnConnectivityError() = runBlocking {
-        coEvery {
-            service.get()
-        } throws IOException()
-
-        sut.get().test {
-            val receivedValue = awaitItem() as HttpClientResult.Failure
-            assertEquals(ConnectivityException()::class.java, receivedValue.exception::class.java)
-            awaitComplete()
-        }
-
-        coVerify(exactly = 1) {
-            service.get()
-        }
+        expect(
+            sut = sut,
+            expectedResult = ConnectivityException()
+        )
     }
 
     @Test
-    fun testGetFailsOn400HttpResponse() = runBlocking {
-        val response = Response.error<RemoteRootCryptoFeed>(400, ResponseBody.create(null, ""))
-
-        coEvery {
-            service.get()
-        } throws HttpException(response)
-
-        sut.get().test {
-            val receivedValue = awaitItem() as HttpClientResult.Failure
-            assertEquals(BadRequestException()::class.java, receivedValue.exception::class.java)
-            awaitComplete()
-        }
-
-        coVerify(exactly = 1) {
-            service.get()
-        }
+    fun testGetFailsOn400HttpResponse() {
+        expect(
+            withStatusCode = 400,
+            sut = sut,
+            expectedResult = BadRequestException()
+        )
     }
 
     @Test
-    fun testGetFailsOn404HttpResponse() = runBlocking {
-        val response = Response.error<RemoteRootCryptoFeed>(404, ResponseBody.create(null, ""))
+    fun testGetFailsOn404HttpResponse() {
+        expect(
+            withStatusCode = 404,
+            sut = sut,
+            expectedResult = NotFoundException()
+        )
+    }
 
-        coEvery {
-            service.get()
-        } throws HttpException(response)
+    private fun expect(
+        withStatusCode: Int? = null,
+        sut: CryptoFeedRetrofitHttpClient,
+        expectedResult: Any
+    ) = runBlocking {
+        when {
+            withStatusCode != null -> {
+                val response = Response.error<RemoteRootCryptoFeed>(withStatusCode, ResponseBody.create(null, ""))
+                coEvery {
+                    service.get()
+                } throws HttpException(response)
+            }
+
+            expectedResult is ConnectivityException -> {
+                coEvery {
+                    service.get()
+                } throws IOException()
+            }
+        }
 
         sut.get().test {
             val receivedValue = awaitItem() as HttpClientResult.Failure
-            assertEquals(NotFoundException()::class.java, receivedValue.exception::class.java)
+            assertEquals(expectedResult::class.java, receivedValue.exception::class.java)
             awaitComplete()
         }
 
