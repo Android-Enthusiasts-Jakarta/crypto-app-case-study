@@ -13,11 +13,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
-interface CryptoFeedService {
-    suspend fun get()
-}
-
-
 
 class CryptoFeedRetrofitHttpClientTest {
     private val service = mockk<CryptoFeedService>()
