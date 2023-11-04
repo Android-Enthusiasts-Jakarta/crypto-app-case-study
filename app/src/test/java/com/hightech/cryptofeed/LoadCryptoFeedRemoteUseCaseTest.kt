@@ -12,7 +12,6 @@ import com.hightech.cryptofeed.api.InternalServerErrorException
 import com.hightech.cryptofeed.api.InvalidData
 import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
-import com.hightech.cryptofeed.api.LoadCryptoFeedResult
 import com.hightech.cryptofeed.api.RemoteCoinInfo
 import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
 import com.hightech.cryptofeed.api.RemoteDisplay
@@ -20,6 +19,7 @@ import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import com.hightech.cryptofeed.api.RemoteUsd
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
+import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import io.mockk.MockKAnnotations

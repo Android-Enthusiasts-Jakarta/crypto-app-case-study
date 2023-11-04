@@ -2,6 +2,7 @@ package com.hightech.cryptofeed.api
 
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
+import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
@@ -11,11 +12,6 @@ class ConnectivityException : Exception()
 class InvalidDataException : Exception()
 class BadRequestException : Exception()
 class InternalServerErrorException : Exception()
-
-sealed class LoadCryptoFeedResult {
-    data class Success(val cryptoFeedItems: List<CryptoFeed>) : LoadCryptoFeedResult()
-    data class Failure(val exception: Exception) : LoadCryptoFeedResult()
-}
 
 class LoadCryptoFeedRemoteUseCase constructor(
     private val client: HttpClient
