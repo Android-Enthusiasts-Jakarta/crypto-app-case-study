@@ -2,6 +2,8 @@ package com.hightech.cryptofeed.api
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import java.io.IOException
 
 class CryptoFeedRetrofitHttpClient(
     private val service: CryptoFeedService
@@ -10,8 +12,19 @@ class CryptoFeedRetrofitHttpClient(
         try {
             service.get()
         } catch (exception: Exception) {
-            emit(HttpClientResult.Failure(ConnectivityException()))
+            when (exception) {
+                is IOException -> {
+                    emit(HttpClientResult.Failure(ConnectivityException()))
+                }
+
+                is HttpException -> {
+                    when (exception.code()) {
+                        400 -> {
+                            emit(HttpClientResult.Failure(BadRequestException()))
+                        }
+                    }
+                }
+            }
         }
     }
-
 }
