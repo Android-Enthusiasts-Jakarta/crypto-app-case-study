@@ -8,7 +8,8 @@ data class CryptoFeed(
 data class CoinInfo(
     val id: String,
     val name: String,
-    val fullName: String
+    val fullName: String,
+    val imageUrl: String
 )
 
 data class Raw(
@@ -17,5 +18,5 @@ data class Raw(
 
 data class Usd(
     val price: Double,
-    val changePctDay: Long
+    val changePctDay: Float
 )
