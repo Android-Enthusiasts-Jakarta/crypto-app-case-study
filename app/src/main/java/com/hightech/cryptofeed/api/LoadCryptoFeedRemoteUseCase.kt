@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.flow
 class ConnectivityException : Exception()
 class InvalidDataException : Exception()
 class BadRequestException : Exception()
+class NotFoundException : Exception()
 class InternalServerErrorException : Exception()
+class UnexpectedException : Exception()
 
 class LoadCryptoFeedRemoteUseCase constructor(
     private val client: HttpClient
@@ -36,8 +38,16 @@ class LoadCryptoFeedRemoteUseCase constructor(
                             emit(LoadCryptoFeedResult.Failure(BadRequest()))
                         }
 
+                        is NotFoundException -> {
+                            emit(LoadCryptoFeedResult.Failure(NotFound()))
+                        }
+
                         is InternalServerErrorException -> {
                             emit(LoadCryptoFeedResult.Failure(InternalServerError()))
+                        }
+
+                        is UnexpectedException -> {
+                            emit(LoadCryptoFeedResult.Failure(Unexpected()))
                         }
                     }
                 }
@@ -68,4 +78,6 @@ private fun List<RemoteCryptoFeedItem>.toModels(): List<CryptoFeed> {
 class Connectivity : Exception()
 class InvalidData : Exception()
 class BadRequest : Exception()
+class NotFound : Exception()
 class InternalServerError : Exception()
+class Unexpected() : Exception()
