@@ -36,6 +36,9 @@ class CryptoFeedRetrofitHttpClient(
                         }
                     }
                 }
+                else -> {
+                    emit(HttpClientResult.Failure(UnexpectedException()))
+                }
             }
         }
     }

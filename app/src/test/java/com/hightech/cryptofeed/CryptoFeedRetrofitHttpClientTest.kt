@@ -10,6 +10,7 @@ import com.hightech.cryptofeed.api.InternalServerErrorException
 import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.NotFoundException
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
+import com.hightech.cryptofeed.api.UnexpectedException
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -75,6 +76,14 @@ class CryptoFeedRetrofitHttpClientTest {
         )
     }
 
+    @Test
+    fun testGetFailsOnUnexpectedException() {
+        expect(
+            sut = sut,
+            expectedResult = UnexpectedException()
+        )
+    }
+
     private fun expect(
         withStatusCode: Int? = null,
         sut: CryptoFeedRetrofitHttpClient,
@@ -92,6 +101,12 @@ class CryptoFeedRetrofitHttpClientTest {
                 coEvery {
                     service.get()
                 } throws IOException()
+            }
+
+            else -> {
+                coEvery {
+                    service.get()
+                } throws Exception()
             }
         }
 
