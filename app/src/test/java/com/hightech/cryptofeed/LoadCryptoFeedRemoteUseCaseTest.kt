@@ -14,11 +14,8 @@ import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import com.hightech.cryptofeed.api.NotFound
 import com.hightech.cryptofeed.api.NotFoundException
-import com.hightech.cryptofeed.api.RemoteCoinInfo
 import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
-import com.hightech.cryptofeed.api.RemoteDisplay
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
-import com.hightech.cryptofeed.api.RemoteUsd
 import com.hightech.cryptofeed.api.Unexpected
 import com.hightech.cryptofeed.api.UnexpectedException
 import com.hightech.cryptofeed.domain.CoinInfo
@@ -158,37 +155,6 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     @Test
     fun testLoadDeliversItemsOn200HttpResponseWithResponse() {
-        val cryptoFeedItemsResponse = listOf(
-            RemoteCryptoFeedItem(
-                RemoteCoinInfo(
-                    "1",
-                    "BTC",
-                    "Bitcoin",
-                    "imageUrl",
-                ),
-                RemoteDisplay(
-                    RemoteUsd(
-                        1.0,
-                        1F,
-                    ),
-                ),
-            ),
-            RemoteCryptoFeedItem(
-                RemoteCoinInfo(
-                    "2",
-                    "BTC 2",
-                    "Bitcoin 2",
-                    "imageUrl"
-                ),
-                RemoteDisplay(
-                    RemoteUsd(
-                        2.0,
-                        2F,
-                    ),
-                ),
-            ),
-        )
-
         val cryptoFeedItems = listOf(
             CryptoFeed(
                 CoinInfo(
@@ -223,7 +189,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             sut = sut,
             receivedHttpClientResult = HttpClientResult.Success(RemoteRootCryptoFeed(
-                cryptoFeedItemsResponse
+                cryptoFeedResponse
             )),
             expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
             exactly = 1
