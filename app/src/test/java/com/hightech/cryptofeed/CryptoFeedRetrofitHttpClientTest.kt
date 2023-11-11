@@ -13,6 +13,7 @@ import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import com.hightech.cryptofeed.api.UnexpectedException
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
@@ -119,5 +120,7 @@ class CryptoFeedRetrofitHttpClientTest {
         coVerify(exactly = 1) {
             service.get()
         }
+
+        confirmVerified(service)
     }
 }
