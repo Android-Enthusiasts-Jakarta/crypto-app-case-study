@@ -4,11 +4,11 @@
 
 ## Flowchart
 
-![Crypto Feed Feature](crypto feed_flowchart.png)
+![Crypto Feed Feature](crypto_feed_flowchart.png)
 
 ## Crypto Feed Architecture
 
-![Crypto Feed Feature](crypto feed_architecture.png)
+![Crypto Feed Feature](crypto_feed_architecture.png)
 
 ## BDD Specs
 
