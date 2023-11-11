@@ -9,8 +9,13 @@ import com.hightech.cryptofeed.api.HttpClientResult
 import com.hightech.cryptofeed.api.InternalServerErrorException
 import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.NotFoundException
+import com.hightech.cryptofeed.api.RemoteCoinInfo
+import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
+import com.hightech.cryptofeed.api.RemoteDisplay
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
+import com.hightech.cryptofeed.api.RemoteUsd
 import com.hightech.cryptofeed.api.UnexpectedException
+import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
@@ -85,14 +90,62 @@ class CryptoFeedRetrofitHttpClientTest {
         )
     }
 
+    @Test
+    fun testGetSuccessOn200HttpResponseWithResponse() {
+        val cryptoFeedResponse = listOf(
+            RemoteCryptoFeedItem(
+                RemoteCoinInfo(
+                    "1",
+                    "BTC",
+                    "Bitcoin",
+                    "imageUrl",
+                ),
+                RemoteDisplay(
+                    RemoteUsd(
+                        1.0,
+                        1F,
+                    ),
+                ),
+            ),
+            RemoteCryptoFeedItem(
+                RemoteCoinInfo(
+                    "2",
+                    "BTC 2",
+                    "Bitcoin 2",
+                    "imageUrl"
+                ),
+                RemoteDisplay(
+                    RemoteUsd(
+                        2.0,
+                        2F,
+                    ),
+                ),
+            ),
+        )
+
+        expect(
+            sut = sut,
+            receivedResult = RemoteRootCryptoFeed(cryptoFeedResponse),
+            expectedResult = HttpClientResult.Success(
+                RemoteRootCryptoFeed(
+                    cryptoFeedResponse
+                )
+            )
+        )
+    }
+
     private fun expect(
         withStatusCode: Int? = null,
         sut: CryptoFeedRetrofitHttpClient,
+        receivedResult: Any? = null,
         expectedResult: Any
     ) = runBlocking {
         when {
             withStatusCode != null -> {
-                val response = Response.error<RemoteRootCryptoFeed>(withStatusCode, ResponseBody.create(null, ""))
+                val response = Response.error<RemoteRootCryptoFeed>(
+                    withStatusCode,
+                    ResponseBody.create(null, "")
+                )
                 coEvery {
                     service.get()
                 } throws HttpException(response)
@@ -104,6 +157,12 @@ class CryptoFeedRetrofitHttpClientTest {
                 } throws IOException()
             }
 
+            expectedResult is HttpClientResult.Success -> {
+                coEvery {
+                    service.get()
+                } returns receivedResult as RemoteRootCryptoFeed
+            }
+
             else -> {
                 coEvery {
                     service.get()
@@ -112,8 +171,20 @@ class CryptoFeedRetrofitHttpClientTest {
         }
 
         sut.get().test {
-            val receivedValue = awaitItem() as HttpClientResult.Failure
-            assertEquals(expectedResult::class.java, receivedValue.exception::class.java)
+            when (val receivedResult = awaitItem()) {
+                is HttpClientResult.Success -> {
+                    assertEquals(
+                        expectedResult,
+                        receivedResult
+                    )
+                }
+                is HttpClientResult.Failure -> {
+                    assertEquals(
+                        expectedResult::class.java,
+                        receivedResult.exception::class.java
+                    )
+                }
+            }
             awaitComplete()
         }
 

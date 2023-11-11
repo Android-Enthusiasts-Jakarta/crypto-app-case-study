@@ -10,7 +10,7 @@ class CryptoFeedRetrofitHttpClient(
 ) {
     fun get(): Flow<HttpClientResult> = flow {
         try {
-            service.get()
+            emit(HttpClientResult.Success(service.get()))
         } catch (exception: Exception) {
             when (exception) {
                 is IOException -> {
