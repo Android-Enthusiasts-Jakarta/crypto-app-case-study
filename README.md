@@ -4,11 +4,11 @@
 
 ## Flowchart
 
-![Crypto Feed Flowchart](/crypto_feed_flowchart.png)
+![Crypto Feed Flowchart](crypto_feed_flowchart.png)
 
 ## Crypto Feed Architecture
 
-![Crypto Feed Architecture](https://github.com/Android-Enthusiasts-Jakarta/crypto-app-case-study/blob/main/crypto_feed_flowchart.png)
+![Crypto Feed Architecture](crypto_feed_architecture.png)
 
 ## BDD Specs
 
