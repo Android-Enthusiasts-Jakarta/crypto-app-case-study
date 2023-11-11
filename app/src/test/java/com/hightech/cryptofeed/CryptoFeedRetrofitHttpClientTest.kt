@@ -6,6 +6,7 @@ import com.hightech.cryptofeed.api.ConnectivityException
 import com.hightech.cryptofeed.api.CryptoFeedRetrofitHttpClient
 import com.hightech.cryptofeed.api.CryptoFeedService
 import com.hightech.cryptofeed.api.HttpClientResult
+import com.hightech.cryptofeed.api.InternalServerErrorException
 import com.hightech.cryptofeed.api.NotFoundException
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import io.mockk.coEvery
@@ -19,7 +20,6 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
-
 
 class CryptoFeedRetrofitHttpClientTest {
     private val service = mockk<CryptoFeedService>()
@@ -53,6 +53,15 @@ class CryptoFeedRetrofitHttpClientTest {
             withStatusCode = 404,
             sut = sut,
             expectedResult = NotFoundException()
+        )
+    }
+
+    @Test
+    fun testGetFailsOn500HttpResponse() {
+        expect(
+            withStatusCode = 500,
+            sut = sut,
+            expectedResult = InternalServerErrorException()
         )
     }
 
