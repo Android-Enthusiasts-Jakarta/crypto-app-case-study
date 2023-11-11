@@ -79,7 +79,7 @@ Then the app should display the latest crypto feed from remote
 |----------|----------|
 | `Usd`    | `Object` |
 
-### USD
+### Usd
 | Property       | Type     |
 |----------------|----------|
 | `price`        | `Double` |
