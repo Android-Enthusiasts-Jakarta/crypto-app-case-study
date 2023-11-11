@@ -24,12 +24,14 @@ import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -209,6 +211,11 @@ class LoadCryptoFeedRemoteUseCaseTest {
             expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
             exactly = 1
         )
+    }
+
+    @After
+    fun tearDown() {
+        clearAllMocks()
     }
 
     private fun expect(

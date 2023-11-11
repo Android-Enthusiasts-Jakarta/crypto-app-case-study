@@ -11,12 +11,14 @@ import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.NotFoundException
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import com.hightech.cryptofeed.api.UnexpectedException
+import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -96,6 +98,11 @@ class CryptoFeedRetrofitHttpClientTest {
                 )
             )
         )
+    }
+
+    @After
+    fun tearDown() {
+        clearAllMocks()
     }
 
     private fun expect(
