@@ -27,6 +27,10 @@ class CryptoFeedRetrofitHttpClient(
                             emit(HttpClientResult.Failure(NotFoundException()))
                         }
 
+                        422 -> {
+                            emit(HttpClientResult.Failure(InvalidDataException()))
+                        }
+
                         500 -> {
                             emit(HttpClientResult.Failure(InternalServerErrorException()))
                         }

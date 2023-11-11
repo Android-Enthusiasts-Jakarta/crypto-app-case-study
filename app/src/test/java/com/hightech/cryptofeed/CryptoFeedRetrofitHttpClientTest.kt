@@ -7,6 +7,7 @@ import com.hightech.cryptofeed.api.CryptoFeedRetrofitHttpClient
 import com.hightech.cryptofeed.api.CryptoFeedService
 import com.hightech.cryptofeed.api.HttpClientResult
 import com.hightech.cryptofeed.api.InternalServerErrorException
+import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.NotFoundException
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import io.mockk.coEvery
@@ -53,6 +54,15 @@ class CryptoFeedRetrofitHttpClientTest {
             withStatusCode = 404,
             sut = sut,
             expectedResult = NotFoundException()
+        )
+    }
+
+    @Test
+    fun testGetFailsOn422HttpResponse() {
+        expect(
+            withStatusCode = 422,
+            sut = sut,
+            expectedResult = InvalidDataException()
         )
     }
 
