@@ -43,9 +43,21 @@ So I can always enjoy crypto feed
 
 ```
 Given the user doesn't have connectivity
-And there’s a cached version of the feed
-When the user requests to see the feed
-Then the app should display the latest feed saved
+And there’s a cached version of the crypto feed
+And the cache is less than one day old
+When the user requests to see the crypto feed
+Then the app should display the latest cryoto feed saved
+
+Given the customer doesn't have connectivity
+And there’s a cached version of the crypto feed
+And the cache is one day old or more
+When the customer requests to see the crypto feed
+Then the app should display an error message
+
+Given the customer doesn't have connectivity
+And the cache is empty
+When the customer requests to see the crypto feed
+Then the app should display an error message
 ```
 
 ## Use Cases
@@ -79,29 +91,40 @@ Then the app should display the latest feed saved
 ### Load Crypto Feed From Cache Use Case
 
 #### Primary Course (Happy Path):
-1. Execute "Get Crypto Feed" command.
-2. System fetches feed data from cache.
-3. System validates cache age.
-4. System creates feed from cached data.
-5. System delivers feed.
+1. Execute "Load Crypto Feed" command.
+2. System retrieves feed data from cache.
+3. System validates cache is less than one day old.
+4. System creates crypto feed from cached data.
+5. System delivers crypto feed.
 
 #### Expired Cache Course (Sad Path):
-1. System delivers no feed.
+1. System deletes cache.
+2. System delivers no crypto feed.
 
 #### Empty Cache Course (Sad Path):
-1. System delivers no feed.
+1. System delivers no crypto feed.
 
-### Save Crypto Feed Use Case
+#### Retrieval Error - Error Course (Sad Path):
+1. System delivers error.
+
+### Cache Crypto Feed Use Case
 
 #### Data:
 - Crypto Feed
 
 #### Primary Course (Happy Path):
-1. Execute "Save Crypto Feed" command with above data.
-2. System encodes feed.
-3. System timestamps the new cache.
-4. System replaces the cache with new data.
-5. System delivers success message.
+1. Execute "Cache Crypto Feed" command with above data.
+2. System deletes old cache data.
+3. System encodes crypto feed.
+4. System timestamps the new cache.
+5. System saves new cache data.
+6. System delivers success message.
+
+#### Delete Error Course (Sad Path):
+1. System delivers error.
+
+#### Cache Error Course (Sad Path):
+1. System delivers error.
 
 ## Model Specs
 
