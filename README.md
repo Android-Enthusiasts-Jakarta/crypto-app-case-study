@@ -76,6 +76,21 @@ Then the app should display the latest feed saved
 #### Unexpected error – Error Course (Sad Path):
 1. System delivers unexpected error.
 
+### Load Crypto Feed From Cache Use Case
+
+#### Primary Course (Happy Path):
+1. Execute "Get Crypto Feed" command.
+2. System fetches feed data from cache.
+3. System validates cache age.
+4. System creates feed from cached data.
+5. System delivers feed.
+
+#### Expired Cache Course (Sad Path):
+1. System delivers no feed.
+
+#### Empty Cache Course (Sad Path):
+1. System delivers no feed.
+
 ## Model Specs
 
 ### Crypto Feed
