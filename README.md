@@ -17,7 +17,7 @@
 ### Narrative #1
 
 ```
-As a online user
+As an online user
 I want the app to automatically load the crypto feed
 So I can see the newest crypto feed
 ```
@@ -28,6 +28,24 @@ So I can see the newest crypto feed
 Given the user has connectivity
 When the user requests to see the crypto feed
 Then the app should display the latest crypto feed from remote
+And replace the cache with the new crypto feed
+```
+
+### Narrative #2
+
+```
+As an offline user
+I want the app to show the latest saved version of crypto feed
+So I can always enjoy crypto feed
+```
+
+#### Scenarios (Acceptance criteria)
+
+```
+Given the user doesn't have connectivity
+And there’s a cached version of the feed
+When the user requests to see the feed
+Then the app should display the latest feed saved
 ```
 
 ## Use Cases
