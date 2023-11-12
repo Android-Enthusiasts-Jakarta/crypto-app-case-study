@@ -70,10 +70,10 @@ Then the app should display the latest feed saved
 #### Not Found – Error Course (Sad Path):
 1. System delivers not found error.
 
-#### Internal Server error – Error Course (Sad Path):
+#### Internal Server Error – Error Course (Sad Path):
 1. System delivers internal server error.
 
-#### Unexpected error – Error Course (Sad Path):
+#### Unexpected – Error Course (Sad Path):
 1. System delivers unexpected error.
 
 ### Load Crypto Feed From Cache Use Case
@@ -90,6 +90,18 @@ Then the app should display the latest feed saved
 
 #### Empty Cache Course (Sad Path):
 1. System delivers no feed.
+
+### Save Crypto Feed Use Case
+
+#### Data:
+- Crypto Feed
+
+#### Primary Course (Happy Path):
+1. Execute "Save Crypto Feed" command with above data.
+2. System encodes feed.
+3. System timestamps the new cache.
+4. System replaces the cache with new data.
+5. System delivers success message.
 
 ## Model Specs
 
