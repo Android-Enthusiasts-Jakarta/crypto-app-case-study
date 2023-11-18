@@ -72,6 +72,8 @@ dependencies {
     testImplementation(libs.mockk.agent)
     testImplementation(libs.turbine)
 
+    testImplementation(libs.kotlinx.coroutines.test)
+
     implementation(libs.retrofit)
     implementation(libs.moshi.kotlin)
 }
