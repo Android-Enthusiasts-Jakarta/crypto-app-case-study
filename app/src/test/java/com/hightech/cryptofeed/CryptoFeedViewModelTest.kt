@@ -8,6 +8,7 @@ import com.hightech.cryptofeed.api.Connectivity
 import com.hightech.cryptofeed.api.InternalServerError
 import com.hightech.cryptofeed.api.InvalidData
 import com.hightech.cryptofeed.api.NotFound
+import com.hightech.cryptofeed.api.Unexpected
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.LoadCryptoFeedUseCase
@@ -63,9 +64,7 @@ class CryptoFeedViewModel(private val useCase: LoadCryptoFeedUseCase): ViewModel
                                     is BadRequest -> "Permintaan gagal, coba lagi"
                                     is NotFound -> "Tidak ditemukan, coba lagi"
                                     is InternalServerError -> "Server sedang dalam perbaikan"
-                                    else -> {
-                                        ""
-                                    }
+                                    else -> { "Terjadi kesalahan, coba lagi" }
                                 }
                             )
                         }
@@ -207,6 +206,16 @@ class CryptoFeedViewModelTest {
             sut = sut,
             expectedLoadingResult = false,
             expectedFailedResult = "Server sedang dalam perbaikan"
+        )
+    }
+
+    @Test
+    fun testLoadUnexpectedErrorShowsError() = runBlocking {
+        expect(
+            result = LoadCryptoFeedResult.Failure((Unexpected())),
+            sut = sut,
+            expectedLoadingResult = false,
+            expectedFailedResult = "Terjadi kesalahan, coba lagi"
         )
     }
 
