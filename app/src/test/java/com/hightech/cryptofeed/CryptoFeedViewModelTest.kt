@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.hightech.cryptofeed.api.BadRequest
 import com.hightech.cryptofeed.api.Connectivity
 import com.hightech.cryptofeed.api.InvalidData
+import com.hightech.cryptofeed.api.NotFound
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.LoadCryptoFeedUseCase
@@ -59,6 +60,7 @@ class CryptoFeedViewModel(private val useCase: LoadCryptoFeedUseCase): ViewModel
                                     is Connectivity -> "Tidak ada internet"
                                     is InvalidData -> "Terjadi kesalahan, coba lagi"
                                     is BadRequest -> "Permintaan gagal, coba lagi"
+                                    is NotFound -> "Tidak ditemukan, coba lagi"
                                     else -> {
                                         ""
                                     }
@@ -183,6 +185,16 @@ class CryptoFeedViewModelTest {
             sut = sut,
             expectedLoadingResult = false,
             expectedFailedResult = "Permintaan gagal, coba lagi"
+        )
+    }
+
+    @Test
+    fun testLoadNotFoundShowsNotFoundError() = runBlocking {
+        expect(
+            result = LoadCryptoFeedResult.Failure(NotFound()),
+            sut = sut,
+            expectedLoadingResult = false,
+            expectedFailedResult = "Tidak ditemukan, coba lagi"
         )
     }
 
