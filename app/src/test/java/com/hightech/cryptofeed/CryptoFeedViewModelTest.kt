@@ -53,6 +53,7 @@ class CryptoFeedViewModel(private val useCase: LoadCryptoFeedUseCase): ViewModel
                         is LoadCryptoFeedResult.Success -> TODO()
                         is LoadCryptoFeedResult.Failure -> {
                             it.copy(
+                                isLoading = false,
                                 failed = when(result.exception) {
                                     is Connectivity -> "Tidak ada internet"
                                     is InvalidData -> "Terjadi kesalahan, coba lagi"
@@ -158,7 +159,8 @@ class CryptoFeedViewModelTest {
         expect(
             result = LoadCryptoFeedResult.Failure(Connectivity()),
             sut = sut,
-            "Tidak ada internet"
+            expectedLoadingResult = false,
+            expectedFailedResult = "Tidak ada internet"
         )
     }
 
@@ -167,13 +169,15 @@ class CryptoFeedViewModelTest {
         expect(
             result = LoadCryptoFeedResult.Failure(InvalidData()),
             sut = sut,
-            "Terjadi kesalahan, coba lagi"
+            expectedLoadingResult = false,
+            expectedFailedResult = "Terjadi kesalahan, coba lagi"
         )
     }
 
     private fun expect(
         result: LoadCryptoFeedResult,
         sut: CryptoFeedViewModel,
+        expectedLoadingResult: Boolean,
         expectedFailedResult: String
     ) = runBlocking {
         every {
@@ -184,6 +188,7 @@ class CryptoFeedViewModelTest {
 
         sut.uiState.take(1).test {
             val receivedResult = awaitItem()
+            assertEquals(expectedLoadingResult, receivedResult.isLoading)
             assertEquals(expectedFailedResult, receivedResult.failed)
             awaitComplete()
         }
