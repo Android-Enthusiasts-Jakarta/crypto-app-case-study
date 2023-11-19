@@ -18,11 +18,8 @@ import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import com.hightech.cryptofeed.api.Unexpected
 import com.hightech.cryptofeed.api.UnexpectedException
-import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
-import com.hightech.cryptofeed.domain.Raw
-import com.hightech.cryptofeed.domain.Usd
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.confirmVerified
