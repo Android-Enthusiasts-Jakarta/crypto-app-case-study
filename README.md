@@ -76,6 +76,18 @@ Then the app should display the latest feed saved
 #### Unexpected error – Error Course (Sad Path):
 1. System delivers unexpected error.
 
+### Save Crypto Feed Use Case
+
+#### Data:
+- Crypto Feed
+
+#### Primary Course (Happy Path):
+1. Execute "Save Crypto Feed" command with above data.
+2. System encodes feed.
+3. System timestamps the new cache.
+4. System replaces the cache with new data.
+5. System delivers success message.
+
 ### Load Crypto Feed From Cache Use Case
 
 #### Primary Course (Happy Path):
