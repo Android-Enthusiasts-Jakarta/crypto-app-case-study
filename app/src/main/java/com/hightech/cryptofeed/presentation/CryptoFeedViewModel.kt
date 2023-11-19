@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 data class UiState(
     val isLoading: Boolean = false,
     val cryptoFeed: List<CryptoFeed> = emptyList(),
-    val failed: String = "",
+    val failed: String = ""
 )
 
 class CryptoFeedViewModel(private val useCase: LoadCryptoFeedUseCase): ViewModel() {
