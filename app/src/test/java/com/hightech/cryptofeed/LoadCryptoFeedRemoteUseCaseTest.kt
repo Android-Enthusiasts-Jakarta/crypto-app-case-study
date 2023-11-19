@@ -157,43 +157,12 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     @Test
     fun testLoadDeliversItemsOn200HttpResponseWithResponse() {
-        val cryptoFeedItems = listOf(
-            CryptoFeed(
-                CoinInfo(
-                    "1",
-                    "BTC",
-                    "Bitcoin",
-                    "imageUrl"
-                ),
-                Raw(
-                    Usd(
-                        1.0,
-                        1F,
-                    ),
-                ),
-            ),
-            CryptoFeed(
-                CoinInfo(
-                    "2",
-                    "BTC 2",
-                    "Bitcoin 2",
-                    "imageUrl"
-                ),
-                Raw(
-                    Usd(
-                        2.0,
-                        2F,
-                    ),
-                ),
-            ),
-        )
-
         expect(
             sut = sut,
             receivedHttpClientResult = HttpClientResult.Success(RemoteRootCryptoFeed(
                 cryptoFeedResponse
             )),
-            expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
+            expectedResult = LoadCryptoFeedResult.Success(cryptoFeed),
             exactly = 1
         )
     }
