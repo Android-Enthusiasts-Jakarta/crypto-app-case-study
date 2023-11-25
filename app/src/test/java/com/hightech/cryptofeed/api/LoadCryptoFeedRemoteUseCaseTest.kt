@@ -1,23 +1,6 @@
-package com.hightech.cryptofeed
+package com.hightech.cryptofeed.api
 
 import app.cash.turbine.test
-import com.hightech.cryptofeed.api.BadRequest
-import com.hightech.cryptofeed.api.BadRequestException
-import com.hightech.cryptofeed.api.Connectivity
-import com.hightech.cryptofeed.api.ConnectivityException
-import com.hightech.cryptofeed.api.HttpClient
-import com.hightech.cryptofeed.api.HttpClientResult
-import com.hightech.cryptofeed.api.InternalServerError
-import com.hightech.cryptofeed.api.InternalServerErrorException
-import com.hightech.cryptofeed.api.InvalidData
-import com.hightech.cryptofeed.api.InvalidDataException
-import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
-import com.hightech.cryptofeed.api.NotFound
-import com.hightech.cryptofeed.api.NotFoundException
-import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
-import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
-import com.hightech.cryptofeed.api.Unexpected
-import com.hightech.cryptofeed.api.UnexpectedException
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult

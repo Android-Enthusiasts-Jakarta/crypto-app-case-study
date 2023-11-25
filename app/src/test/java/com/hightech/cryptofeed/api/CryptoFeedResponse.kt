@@ -1,4 +1,4 @@
-package com.hightech.cryptofeed
+package com.hightech.cryptofeed.api
 
 import com.hightech.cryptofeed.api.RemoteCoinInfo
 import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
