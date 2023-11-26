@@ -5,8 +5,10 @@ import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -37,6 +39,23 @@ class CacheCryptoFeedUseCaseTest {
         sut.save(feeds)
 
         verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testSaveDoesNotRequestsCacheInsertionOnDeletionError() = runBlocking {
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
+        every {
+            store.deleteCache()
+        } returns flowOf(Exception())
+
+        sut.save(feeds)
+
+        verify(exactly = 0) {
             store.deleteCache()
         }
 
