@@ -12,20 +12,6 @@ import org.junit.Before
 import org.junit.Test
 import java.util.UUID
 
-class CacheCryptoFeedUseCase constructor(
-    private val store: RoomCryptoFeedStore
-) {
-    fun save(feeds: List<CryptoFeed>) {
-        store.deleteCache()
-    }
-}
-
-class RoomCryptoFeedStore {
-    fun deleteCache() {
-
-    }
-}
-
 class CacheCryptoFeedUseCaseTest {
     private val store = spyk<RoomCryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
