@@ -50,13 +50,13 @@ class CacheCryptoFeedUseCaseTest {
         val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
 
         every {
-            store.deleteCache()
-        } returns flowOf(Exception())
+            store.insert(feeds)
+        } returns flowOf()
 
         sut.save(feeds)
 
         verify(exactly = 0) {
-            store.deleteCache()
+            store.insert(feeds)
         }
 
         confirmVerified(store)

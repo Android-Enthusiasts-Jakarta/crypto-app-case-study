@@ -2,6 +2,7 @@ package com.hightech.cryptofeed.cache
 
 import com.hightech.cryptofeed.domain.CryptoFeed
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 
 class CacheCryptoFeedUseCase constructor(
@@ -16,5 +17,9 @@ class CacheCryptoFeedUseCase constructor(
 
 class RoomCryptoFeedStore {
     fun deleteCache(): Flow<Exception> = flow {
+    }
+
+    fun insert(feeds: List<CryptoFeed>): Flow<Unit> = flow {
+
     }
 }
