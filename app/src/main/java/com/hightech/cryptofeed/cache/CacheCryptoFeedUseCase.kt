@@ -9,17 +9,30 @@ class CacheCryptoFeedUseCase constructor(
     private val store: RoomCryptoFeedStore
 ) {
     fun save(feeds: List<CryptoFeed>): Flow<Exception> = flow {
-        store.deleteCache().collect { error ->
-
+        store.deleteCache().collect { result ->
+            when(result) {
+                is DeleteResult.Failure -> {
+                    if (result.exception is DeletionErrorException) {
+                        emit(DeletionError())
+                    }
+                }
+            }
         }
     }
 }
 
+class DeletionError : Exception()
+
+sealed interface DeleteResult {
+    data class Failure(val exception: Exception): DeleteResult
+}
+
 class RoomCryptoFeedStore {
-    fun deleteCache(): Flow<Exception> = flow {
-    }
+    fun deleteCache(): Flow<DeleteResult> = flow {}
 
-    fun insert(feeds: List<CryptoFeed>): Flow<Unit> = flow {
-
+    fun insert(feeds: List<CryptoFeed>): Flow<Exception> = flow {
+        println("test")
     }
 }
+
+class DeletionErrorException : Exception()
