@@ -11,6 +11,9 @@ class CacheCryptoFeedUseCase constructor(
     fun save(feeds: List<CryptoFeed>): Flow<Exception> = flow {
         store.deleteCache().collect { result ->
             when(result) {
+                is DeleteResult.Success -> {
+                    emitAll(store.insert(feeds))
+                }
                 is DeleteResult.Failure -> {
                     if (result.exception is DeletionErrorException) {
                         emit(DeletionError())
@@ -24,6 +27,7 @@ class CacheCryptoFeedUseCase constructor(
 class DeletionError : Exception()
 
 sealed interface DeleteResult {
+    class Success: DeleteResult
     data class Failure(val exception: Exception): DeleteResult
 }
 

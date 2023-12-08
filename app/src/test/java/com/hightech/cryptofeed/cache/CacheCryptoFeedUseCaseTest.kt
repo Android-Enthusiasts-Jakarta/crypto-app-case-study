@@ -78,6 +78,33 @@ class CacheCryptoFeedUseCaseTest {
         confirmVerified(store)
     }
 
+    @Test
+    fun testSaveRequestsNewCacheInsertionOnSuccessfulDeletion() = runBlocking {
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
+        every {
+            store.deleteCache()
+        } returns flowOf(DeleteResult.Success())
+
+        every {
+            store.insert(feeds)
+        } returns flowOf()
+
+        sut.save(feeds).test {
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.insert(feeds)
+        }
+
+        confirmVerified(store)
+    }
+
     private fun uniqueCryptoFeed(): CryptoFeed {
         return CryptoFeed(
             CoinInfo(
