@@ -14,15 +14,18 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 import java.util.UUID
 
 class CacheCryptoFeedUseCaseTest {
     private val store = spyk<RoomCryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
+    private val timestamp = Date()
+
     @Before
     fun setUp() {
-        sut = CacheCryptoFeedUseCase(store)
+        sut = CacheCryptoFeedUseCase(store, timestamp)
     }
 
     @Test
@@ -71,7 +74,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 0) {
-            store.insert(feeds)
+            store.insert(feeds, timestamp)
         }
 
         confirmVerified(store)
@@ -85,9 +88,28 @@ class CacheCryptoFeedUseCaseTest {
             store.deleteCache()
         } returns flowOf(DeleteResult.Success())
 
+        sut.save(feeds).test {
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.insert(feeds, timestamp)
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
         every {
-            store.insert(feeds)
-        } returns flowOf()
+            store.deleteCache()
+        } returns flowOf(DeleteResult.Success())
 
         sut.save(feeds).test {
             awaitComplete()
@@ -98,7 +120,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 1) {
-            store.insert(feeds)
+            store.insert(feeds, timestamp)
         }
 
         confirmVerified(store)
