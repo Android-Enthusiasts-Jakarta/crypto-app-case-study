@@ -17,9 +17,7 @@ class CacheCryptoFeedUseCase constructor(
                     emitAll(store.insert(feeds, currentDate))
                 }
                 is DeleteResult.Failure -> {
-                    if (result.exception is DeletionErrorException) {
-                        emit(DeletionError())
-                    }
+                    emit(DeletionError())
                 }
             }
         }
@@ -30,7 +28,7 @@ class DeletionError : Exception()
 
 sealed interface DeleteResult {
     class Success: DeleteResult
-    data class Failure(val exception: Exception): DeleteResult
+    class Failure: DeleteResult
 }
 
 class RoomCryptoFeedStore {
@@ -38,5 +36,3 @@ class RoomCryptoFeedStore {
 
     fun insert(feeds: List<CryptoFeed>, timestamp: Date): Flow<Exception> = flow {}
 }
-
-class DeletionErrorException : Exception()
