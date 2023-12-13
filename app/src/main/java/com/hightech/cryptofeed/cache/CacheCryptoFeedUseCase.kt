@@ -14,7 +14,9 @@ class CacheCryptoFeedUseCase constructor(
         store.deleteCache().collect { result ->
             when(result) {
                 is DeleteResult.Success -> {
-                    emitAll(store.insert(feeds, currentDate))
+                    store.insert(feeds, currentDate).collect { error ->
+                        emit(error)
+                    }
                 }
                 is DeleteResult.Failure -> {
                     emit(DeletionError())
