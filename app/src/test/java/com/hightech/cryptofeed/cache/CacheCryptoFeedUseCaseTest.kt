@@ -12,6 +12,8 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -62,7 +64,7 @@ class CacheCryptoFeedUseCaseTest {
 
         every {
             store.deleteCache()
-        } returns flowOf(DeleteResult.Success())
+        } returns flowOf(null)
 
         sut.save(feeds).test {
             awaitComplete()
@@ -85,10 +87,10 @@ class CacheCryptoFeedUseCaseTest {
 
         every {
             store.deleteCache()
-        } returns flowOf(DeleteResult.Failure())
+        } returns flowOf(Exception())
 
         sut.save(feeds).test {
-            assertEquals(DeletionError::class.java, awaitItem()::class.java)
+            assertNotNull(awaitItem()!!::class.java)
             awaitComplete()
         }
 
@@ -109,14 +111,42 @@ class CacheCryptoFeedUseCaseTest {
 
         every {
             store.deleteCache()
-        } returns flowOf(DeleteResult.Success())
+        } returns flowOf(null)
 
         every {
             store.insert(feeds, timestamp)
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
-            assertEquals(Exception::class.java, awaitItem()::class.java)
+            assertEquals(Exception::class.java, awaitItem()!!::class.java)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.insert(feeds, timestamp)
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testSaveSucceedsOnSuccessfulCacheInsertion() = runBlocking {
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
+        every {
+            store.deleteCache()
+        } returns flowOf(null)
+
+        every {
+            store.insert(feeds, timestamp)
+        } returns flowOf(null)
+
+        sut.save(feeds).test {
+            assertNull(awaitItem())
             awaitComplete()
         }
 
