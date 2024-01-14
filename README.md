@@ -90,6 +90,9 @@ Then the app should display the latest feed saved
 
 ### Load Crypto Feed From Cache Use Case
 
+#### Data:
+- Max Age
+
 #### Primary Course (Happy Path):
 1. Execute "Get Crypto Feed" command.
 2. System fetches feed data from cache.
