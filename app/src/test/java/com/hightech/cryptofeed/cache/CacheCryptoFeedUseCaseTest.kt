@@ -59,6 +59,30 @@ class CacheCryptoFeedUseCaseTest {
     }
 
     @Test
+    fun testSaveDoesNotRequestCacheInsertionOnDeletionError() = runBlocking {
+        val feed = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
+        every {
+            store.deleteCache()
+        } returns flowOf(Exception())
+
+        sut.save(feed).test {
+            skipItems(1)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 0) {
+            store.insert(feed, timestamp)
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
     fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
         val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
 
