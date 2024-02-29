@@ -31,7 +31,7 @@ class CacheCryptoFeedUseCaseTest {
     }
 
     @Test
-    fun testInitDoesNotDeleteCacheUponCreation() = runBlocking {
+    fun testInitDoesNotDeleteCacheUponCreation() {
         verify(exactly = 0) {
             store.deleteCache()
         }
