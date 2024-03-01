@@ -7,13 +7,12 @@ import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -22,6 +21,8 @@ import java.util.UUID
 class CacheCryptoFeedUseCaseTest {
     private val store = spyk<RoomCryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
+
+    private val feed = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
 
     private val timestamp = Date()
 
@@ -84,13 +85,20 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+        val captureTimestamp = slot<Date>()
+        val captureFeed = slot<List<CryptoFeed>>()
 
         every {
             store.deleteCache()
         } returns flowOf(null)
 
-        sut.save(feeds).test {
+        every {
+            store.insert(capture(captureFeed), capture(captureTimestamp))
+        } returns flowOf()
+
+        sut.save(feed).test {
+            assertEquals(feed, captureFeed.captured)
+            assertEquals(timestamp, captureTimestamp.captured)
             awaitComplete()
         }
 
@@ -99,87 +107,83 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 1) {
-            store.insert(feeds, timestamp)
+            store.insert(feed, timestamp)
         }
 
         confirmVerified(store)
     }
 
     @Test
-    fun testSaveFailsOnDeletionError() = runBlocking {
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-
-        every {
-            store.deleteCache()
-        } returns flowOf(Exception())
-
-        sut.save(feeds).test {
-            assertNotNull(awaitItem()!!::class.java)
-            awaitComplete()
-        }
-
-        verify(exactly = 1) {
-            store.deleteCache()
-        }
-
-        verify(exactly = 0) {
-            store.insert(feeds, timestamp)
-        }
-
-        confirmVerified(store)
+    fun testSaveFailsOnDeletionError() {
+        expect(
+            sut = sut, expectedError = Exception(), action = {
+                every {
+                    store.deleteCache()
+                } returns flowOf(Exception())
+            },
+            deleteExactly = 1,
+            insertExactly = 0
+        )
     }
 
     @Test
-    fun testSaveFailsOnInsertionError() = runBlocking {
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+    fun testSaveFailsOnInsertionError() {
+        expect(
+            sut = sut, expectedError = Exception(), action = {
+                every {
+                    store.deleteCache()
+                } returns flowOf(null)
 
-        every {
-            store.deleteCache()
-        } returns flowOf(null)
-
-        every {
-            store.insert(feeds, timestamp)
-        } returns flowOf(Exception())
-
-        sut.save(feeds).test {
-            assertEquals(Exception::class.java, awaitItem()!!::class.java)
-            awaitComplete()
-        }
-
-        verify(exactly = 1) {
-            store.deleteCache()
-        }
-
-        verify(exactly = 1) {
-            store.insert(feeds, timestamp)
-        }
-
-        confirmVerified(store)
+                every {
+                    store.insert(feed, timestamp)
+                } returns flowOf(Exception())
+            },
+            deleteExactly = 1,
+            insertExactly = 1
+        )
     }
 
     @Test
-    fun testSaveSucceedsOnSuccessfulCacheInsertion() = runBlocking {
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+    fun testSaveSucceedsOnSuccessfulCacheInsertion() {
+        expect(
+            sut = sut, expectedError = null, action = {
+                every {
+                    store.deleteCache()
+                } returns flowOf(null)
 
-        every {
-            store.deleteCache()
-        } returns flowOf(null)
+                every {
+                    store.insert(feed, timestamp)
+                } returns flowOf(null)
+            },
+            deleteExactly = 1,
+            insertExactly = 1
+        )
+    }
 
-        every {
-            store.insert(feeds, timestamp)
-        } returns flowOf(null)
+    private fun expect(
+        sut: CacheCryptoFeedUseCase,
+        expectedError: Exception?,
+        action: () -> Unit,
+        deleteExactly: Int = -1,
+        insertExactly: Int = -1,
+    ) = runBlocking {
+        action()
 
-        sut.save(feeds).test {
-            assertNull(awaitItem())
+        sut.save(feed).test {
+            if (expectedError != null) {
+                assertEquals(expectedError::class.java, awaitItem()!!::class.java)
+            } else {
+                assertEquals(expectedError, awaitItem())
+            }
             awaitComplete()
         }
 
-        verify(exactly = 1) {
+        verify(exactly = deleteExactly) {
             store.deleteCache()
         }
 
-        verify(exactly = 1) {
-            store.insert(feeds, timestamp)
+        verify(exactly = insertExactly) {
+            store.insert(feed, timestamp)
         }
 
         confirmVerified(store)
@@ -188,12 +192,8 @@ class CacheCryptoFeedUseCaseTest {
     private fun uniqueCryptoFeed(): CryptoFeed {
         return CryptoFeed(
             CoinInfo(
-                UUID.randomUUID().toString(),
-                "any",
-                "any",
-                "any-url"
-            ),
-            Raw(
+                UUID.randomUUID().toString(), "any", "any", "any-url"
+            ), Raw(
                 Usd(
                     1.0,
                     1F,
