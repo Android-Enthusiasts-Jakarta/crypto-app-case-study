@@ -10,6 +10,7 @@ import com.hightech.cryptofeed.api.InternalServerErrorException
 import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.NotFoundException
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
+import com.hightech.cryptofeed.api.RootCryptoFeedResponse
 import com.hightech.cryptofeed.api.UnexpectedException
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -91,10 +92,10 @@ class CryptoFeedRetrofitHttpClientTest {
     fun testGetSuccessOn200HttpResponseWithResponse() {
         expect(
             sut = sut,
-            receivedResult = RemoteRootCryptoFeed(cryptoFeedResponse),
+            receivedResult = RootCryptoFeedResponse(cryptoFeedResponse),
             expectedResult = HttpClientResult.Success(
                 RemoteRootCryptoFeed(
-                    cryptoFeedResponse
+                    remoteCryptoFeed
                 )
             )
         )
@@ -131,7 +132,7 @@ class CryptoFeedRetrofitHttpClientTest {
             expectedResult is HttpClientResult.Success -> {
                 coEvery {
                     service.get()
-                } returns receivedResult as RemoteRootCryptoFeed
+                } returns receivedResult as RootCryptoFeedResponse
             }
 
             else -> {

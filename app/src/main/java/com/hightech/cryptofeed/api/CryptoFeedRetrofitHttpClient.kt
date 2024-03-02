@@ -10,7 +10,8 @@ class CryptoFeedRetrofitHttpClient(
 ) {
     fun get(): Flow<HttpClientResult> = flow {
         try {
-            emit(HttpClientResult.Success(service.get()))
+            val response = service.get()
+            emit(HttpClientResult.Success(toModels(response)))
         } catch (exception: Exception) {
             when (exception) {
                 is IOException -> {
@@ -36,10 +37,32 @@ class CryptoFeedRetrofitHttpClient(
                         }
                     }
                 }
+
                 else -> {
                     emit(HttpClientResult.Failure(UnexpectedException()))
                 }
             }
         }
+    }
+
+    private fun toModels(response: RootCryptoFeedResponse): RemoteRootCryptoFeed {
+        return RemoteRootCryptoFeed(
+            data = response.data.map {
+                RemoteCryptoFeed(
+                    remoteCoinInfo = RemoteCoinInfo(
+                        id = it.coinInfoResponse.id,
+                        name = it.coinInfoResponse.name,
+                        fullName = it.coinInfoResponse.fullName,
+                        imageUrl = it.coinInfoResponse.imageUrl,
+                    ),
+                    remoteRaw = RemoteRaw(
+                        remoteUsd = RemoteUsd(
+                            price = it.rawResponse.usdResponse.price,
+                            changePctDay = it.rawResponse.usdResponse.changePctDay
+                        )
+                    )
+                )
+            }
+        )
     }
 }

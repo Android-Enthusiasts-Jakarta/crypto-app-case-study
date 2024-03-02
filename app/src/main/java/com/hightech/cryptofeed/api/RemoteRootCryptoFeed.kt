@@ -2,19 +2,19 @@ package com.hightech.cryptofeed.api
 
 import com.squareup.moshi.Json
 
-data class RemoteRootCryptoFeed(
+data class RootCryptoFeedResponse(
     @Json(name = "Data")
-    val data: List<RemoteCryptoFeedItem>
+    val data: List<CryptoFeedResponse>
 )
 
-data class RemoteCryptoFeedItem(
+data class CryptoFeedResponse(
     @Json(name = "CoinInfo")
-    val remoteCoinInfo: RemoteCoinInfo,
+    val coinInfoResponse: CoinInfoResponse,
     @Json(name = "RAW")
-    val remoteRaw: RemoteDisplay
+    val rawResponse: RawResponse
 )
 
-data class RemoteCoinInfo(
+data class CoinInfoResponse(
     @Json(name = "Id")
     val id: String,
     @Json(name = "Name")
@@ -25,14 +25,39 @@ data class RemoteCoinInfo(
     val imageUrl: String,
 )
 
-data class RemoteDisplay(
+data class RawResponse(
     @Json(name = "USD")
-    val usd: RemoteUsd
+    val usdResponse: UsdResponse
 )
 
-data class RemoteUsd(
+data class UsdResponse(
     @Json(name = "PRICE")
     val price: Double,
     @Json(name = "CHANGEPCTDAY")
+    val changePctDay: Float
+)
+
+data class RemoteRootCryptoFeed(
+    val data: List<RemoteCryptoFeed>
+)
+
+data class RemoteCryptoFeed(
+    val remoteCoinInfo: RemoteCoinInfo,
+    val remoteRaw: RemoteRaw
+)
+
+data class RemoteCoinInfo(
+    val id: String,
+    val name: String,
+    val fullName: String,
+    val imageUrl: String,
+)
+
+data class RemoteRaw(
+    val remoteUsd: RemoteUsd
+)
+
+data class RemoteUsd(
+    val price: Double,
     val changePctDay: Float
 )

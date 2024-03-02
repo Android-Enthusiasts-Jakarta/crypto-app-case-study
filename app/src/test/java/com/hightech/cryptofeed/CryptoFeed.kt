@@ -4,6 +4,7 @@ import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
+import java.util.UUID
 
 val cryptoFeed = listOf(
     CryptoFeed(

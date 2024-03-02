@@ -1,34 +1,69 @@
 package com.hightech.cryptofeed
 
+import com.hightech.cryptofeed.api.CoinInfoResponse
+import com.hightech.cryptofeed.api.CryptoFeedResponse
+import com.hightech.cryptofeed.api.RawResponse
 import com.hightech.cryptofeed.api.RemoteCoinInfo
-import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
-import com.hightech.cryptofeed.api.RemoteDisplay
+import com.hightech.cryptofeed.api.RemoteCryptoFeed
+import com.hightech.cryptofeed.api.RemoteRaw
 import com.hightech.cryptofeed.api.RemoteUsd
+import com.hightech.cryptofeed.api.UsdResponse
 
-val cryptoFeedResponse = listOf(
-    RemoteCryptoFeedItem(
+val remoteCryptoFeed = listOf(
+    RemoteCryptoFeed(
         RemoteCoinInfo(
             "1",
             "BTC",
             "Bitcoin",
             "imageUrl",
         ),
-        RemoteDisplay(
+        RemoteRaw(
             RemoteUsd(
                 1.0,
                 1F,
             ),
         ),
     ),
-    RemoteCryptoFeedItem(
+    RemoteCryptoFeed(
         RemoteCoinInfo(
             "2",
             "BTC 2",
             "Bitcoin 2",
             "imageUrl"
         ),
-        RemoteDisplay(
+        RemoteRaw(
             RemoteUsd(
+                2.0,
+                2F,
+            ),
+        ),
+    ),
+)
+
+val cryptoFeedResponse = listOf(
+    CryptoFeedResponse(
+        CoinInfoResponse(
+            "1",
+            "BTC",
+            "Bitcoin",
+            "imageUrl",
+        ),
+        RawResponse(
+            UsdResponse(
+                1.0,
+                1F,
+            ),
+        ),
+    ),
+    CryptoFeedResponse(
+        CoinInfoResponse(
+            "2",
+            "BTC 2",
+            "Bitcoin 2",
+            "imageUrl"
+        ),
+        RawResponse(
+            UsdResponse(
                 2.0,
                 2F,
             ),

@@ -56,7 +56,7 @@ class LoadCryptoFeedRemoteUseCase constructor(
     }
 }
 
-private fun List<RemoteCryptoFeedItem>.toModels(): List<CryptoFeed> {
+private fun List<RemoteCryptoFeed>.toModels(): List<CryptoFeed> {
     return map {
         CryptoFeed(
             CoinInfo(
@@ -67,8 +67,8 @@ private fun List<RemoteCryptoFeedItem>.toModels(): List<CryptoFeed> {
             ),
             Raw(
                 Usd(
-                    it.remoteRaw.usd.price,
-                    it.remoteRaw.usd.changePctDay,
+                    it.remoteRaw.remoteUsd.price,
+                    it.remoteRaw.remoteUsd.changePctDay,
                 ),
             ),
         )

@@ -14,13 +14,12 @@ import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.LoadCryptoFeedRemoteUseCase
 import com.hightech.cryptofeed.api.NotFound
 import com.hightech.cryptofeed.api.NotFoundException
-import com.hightech.cryptofeed.api.RemoteCryptoFeedItem
+import com.hightech.cryptofeed.api.RemoteCryptoFeed
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import com.hightech.cryptofeed.api.Unexpected
 import com.hightech.cryptofeed.api.UnexpectedException
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
-import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -39,8 +38,6 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-
         sut = LoadCryptoFeedRemoteUseCase(client)
     }
 
@@ -153,28 +150,32 @@ class LoadCryptoFeedRemoteUseCaseTest {
     }
 
     @Test
-    fun testLoadDeliversItemsOn200HttpResponseWithResponse() {
+    fun testLoadDeliversCryptoFeedOnSuccessWithCryptoFeed() {
         expect(
             sut = sut,
-            receivedHttpClientResult = HttpClientResult.Success(RemoteRootCryptoFeed(
-                cryptoFeedResponse
-            )),
+            receivedHttpClientResult = HttpClientResult.Success(
+                RemoteRootCryptoFeed(
+                    remoteCryptoFeed
+                )
+            ),
             expectedResult = LoadCryptoFeedResult.Success(cryptoFeed),
             exactly = 1
         )
     }
 
     @Test
-    fun testLoadDeliversNoItemsOn200HttpResponseWithEmptyResponse() {
-        val cryptoFeedItemsResponse = emptyList<RemoteCryptoFeedItem>()
-        val cryptoFeedItems = emptyList<CryptoFeed>()
+    fun testLoadDeliversEmptyCryptoFeedOnSuccessWithEmptyCryptoFeed() {
+        val emptyRemoteCryptoFeed = emptyList<RemoteCryptoFeed>()
+        val cryptoFeed = emptyList<CryptoFeed>()
 
         expect(
             sut = sut,
-            receivedHttpClientResult = HttpClientResult.Success(RemoteRootCryptoFeed(
-                cryptoFeedItemsResponse
-            )),
-            expectedResult = LoadCryptoFeedResult.Success(cryptoFeedItems),
+            receivedHttpClientResult = HttpClientResult.Success(
+                RemoteRootCryptoFeed(
+                    emptyRemoteCryptoFeed
+                )
+            ),
+            expectedResult = LoadCryptoFeedResult.Success(cryptoFeed),
             exactly = 1
         )
     }
@@ -202,6 +203,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
                         receivedResult
                     )
                 }
+
                 is LoadCryptoFeedResult.Failure -> {
                     assertEquals(
                         expectedResult::class.java,
