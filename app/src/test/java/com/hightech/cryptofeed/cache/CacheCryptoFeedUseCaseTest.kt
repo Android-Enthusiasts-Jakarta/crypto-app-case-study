@@ -10,6 +10,7 @@ import io.mockk.every
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -102,6 +103,11 @@ class CacheCryptoFeedUseCaseTest {
             awaitComplete()
         }
 
+        verifyOrder {
+            store.deleteCache()
+            store.insert(feed, timestamp)
+        }
+
         verify(exactly = 1) {
             store.deleteCache()
         }
@@ -138,6 +144,12 @@ class CacheCryptoFeedUseCaseTest {
                     store.insert(feed, timestamp)
                 } returns flowOf(Exception())
             },
+            ordering = {
+                verifyOrder {
+                    store.deleteCache()
+                    store.insert(feed, timestamp)
+                }
+            },
             deleteExactly = 1,
             insertExactly = 1
         )
@@ -155,6 +167,12 @@ class CacheCryptoFeedUseCaseTest {
                     store.insert(feed, timestamp)
                 } returns flowOf(null)
             },
+            ordering = {
+                verifyOrder {
+                    store.deleteCache()
+                    store.insert(feed, timestamp)
+                }
+            },
             deleteExactly = 1,
             insertExactly = 1
         )
@@ -164,6 +182,7 @@ class CacheCryptoFeedUseCaseTest {
         sut: CacheCryptoFeedUseCase,
         expectedError: Exception?,
         action: () -> Unit,
+        ordering: () -> Unit = {},
         deleteExactly: Int = -1,
         insertExactly: Int = -1,
     ) = runBlocking {
@@ -177,6 +196,8 @@ class CacheCryptoFeedUseCaseTest {
             }
             awaitComplete()
         }
+
+        ordering()
 
         verify(exactly = deleteExactly) {
             store.deleteCache()
