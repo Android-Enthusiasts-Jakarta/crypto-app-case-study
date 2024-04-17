@@ -11,12 +11,12 @@ class CacheCryptoFeedUseCase constructor(
 ) {
     fun save(feeds: List<CryptoFeed>): Flow<Exception?> = flow {
         store.deleteCache().collect { deleteError ->
-            if (deleteError == null) {
+            if (deleteError != null) {
+                emit(deleteError)
+            } else {
                 store.insert(feeds, currentDate).collect { insertError ->
                     emit(insertError)
                 }
-            } else {
-                emit(deleteError)
             }
         }
     }
