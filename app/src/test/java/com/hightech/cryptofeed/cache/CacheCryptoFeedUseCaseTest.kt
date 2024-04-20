@@ -66,7 +66,7 @@ class CacheCryptoFeedUseCaseTest {
 
         every {
             store.deleteCache()
-        } returns flowOf(Exception())
+        } returns flowOf(SaveResult())
 
         sut.save(feed).test {
             skipItems(1)
@@ -125,7 +125,7 @@ class CacheCryptoFeedUseCaseTest {
             sut = sut, expectedError = Exception(), action = {
                 every {
                     store.deleteCache()
-                } returns flowOf(Exception())
+                } returns flowOf(SaveResult())
             },
             deleteExactly = 1,
             insertExactly = 0
