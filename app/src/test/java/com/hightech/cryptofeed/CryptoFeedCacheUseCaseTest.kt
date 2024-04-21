@@ -32,7 +32,13 @@ class CryptoFeedCacheUseCaseTest {
 
     @Test
     fun testSaveRequestsCacheDeletion() = runBlocking {
-        sut.save()
+        every {
+            store.deleteCache()
+        } returns flowOf()
+
+        sut.save().test {
+            awaitComplete()
+        }
 
         verify(exactly = 1) {
             store.deleteCache()
