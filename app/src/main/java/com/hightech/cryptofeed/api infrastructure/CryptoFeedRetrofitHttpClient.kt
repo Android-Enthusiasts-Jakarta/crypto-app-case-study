@@ -1,5 +1,17 @@
-package com.hightech.cryptofeed.api
+package com.hightech.cryptofeed.`api infrastructure`
 
+import com.hightech.cryptofeed.api.BadRequestException
+import com.hightech.cryptofeed.api.ConnectivityException
+import com.hightech.cryptofeed.api.HttpClientResult
+import com.hightech.cryptofeed.api.InternalServerErrorException
+import com.hightech.cryptofeed.api.InvalidDataException
+import com.hightech.cryptofeed.api.NotFoundException
+import com.hightech.cryptofeed.api.RemoteCoinInfo
+import com.hightech.cryptofeed.api.RemoteCryptoFeed
+import com.hightech.cryptofeed.api.RemoteRaw
+import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
+import com.hightech.cryptofeed.api.RemoteUsd
+import com.hightech.cryptofeed.api.UnexpectedException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException

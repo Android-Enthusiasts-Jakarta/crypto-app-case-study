@@ -1,4 +1,4 @@
-package com.hightech.cryptofeed.api
+package com.hightech.cryptofeed.`api infrastructure`
 
 import com.squareup.moshi.Json
 
