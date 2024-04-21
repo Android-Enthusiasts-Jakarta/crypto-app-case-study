@@ -1,21 +1,13 @@
 package com.hightech.cryptofeed
 
+import com.hightech.cryptofeed.cache.CryptoFeedCacheUseCase
+import com.hightech.cryptofeed.cache.CryptoFeedStore
 import io.mockk.confirmVerified
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-
-interface CryptoFeedStore {
-    fun deleteCache()
-}
-
-class CryptoFeedCacheUseCase constructor(private val store: CryptoFeedStore) {
-    fun save() {
-        store.deleteCache()
-    }
-}
 
 class CryptoFeedCacheUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
