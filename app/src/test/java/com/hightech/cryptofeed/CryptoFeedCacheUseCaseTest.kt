@@ -9,10 +9,12 @@ import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import io.mockk.confirmVerified
 import io.mockk.every
+import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.UUID
@@ -69,7 +71,7 @@ class CryptoFeedCacheUseCaseTest {
         }
 
         verify(exactly = 0) {
-            store.insert()
+            store.insert(feeds)
         }
 
         confirmVerified(store)
@@ -77,15 +79,18 @@ class CryptoFeedCacheUseCaseTest {
 
     @Test
     fun testSaveRequestsNewCacheInsertionOnSuccessfulDeletion() = runBlocking {
+        val captureFeed = slot<List<CryptoFeed>>()
+
         every {
             store.deleteCache()
         } returns flowOf(null)
 
         every {
-            store.insert()
+            store.insert(capture(captureFeed))
         } returns flowOf()
 
         sut.save(feeds).test {
+            assertEquals(feeds, captureFeed.captured)
             awaitComplete()
         }
 
@@ -94,7 +99,7 @@ class CryptoFeedCacheUseCaseTest {
         }
 
         verify(exactly = 1) {
-            store.insert()
+            store.insert(feeds)
         }
 
         confirmVerified(store)

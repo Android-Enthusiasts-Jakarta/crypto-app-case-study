@@ -6,14 +6,14 @@ import kotlinx.coroutines.flow.flow
 
 interface CryptoFeedStore {
     fun deleteCache(): Flow<Exception?>
-    fun insert(): Flow<Exception>
+    fun insert(feeds: List<CryptoFeed>): Flow<Exception>
 }
 
 class CryptoFeedCacheUseCase constructor(private val store: CryptoFeedStore) {
     fun save(feeds: List<CryptoFeed>): Flow<Exception> = flow {
         store.deleteCache().collect { error ->
             if (error == null) {
-                store.insert()
+                store.insert(feeds)
             }
         }
     }
