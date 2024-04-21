@@ -1,4 +1,4 @@
-package com.hightech.cryptofeed.`api infrastructure`
+package com.hightech.cryptofeed.apiinfra
 
 import com.hightech.cryptofeed.api.BadRequestException
 import com.hightech.cryptofeed.api.ConnectivityException
