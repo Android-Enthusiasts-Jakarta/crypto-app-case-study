@@ -8,7 +8,7 @@ import java.util.Date
 
 interface CryptoFeedStore {
     fun deleteCache(): Flow<Exception?>
-    fun insert(feeds: List<CryptoFeed>, timestamp: Date): Flow<Exception>
+    fun insert(feeds: List<CryptoFeed>, timestamp: Date): Flow<Exception?>
 }
 
 class CryptoFeedCacheUseCase constructor(

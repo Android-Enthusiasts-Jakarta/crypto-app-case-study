@@ -12,6 +12,7 @@ import io.mockk.every
 import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -91,12 +92,17 @@ class CryptoFeedCacheUseCaseTest {
 
         every {
             store.insert(capture(captureFeed), capture(captureTimeStamp))
-        } returns flowOf()
+        } returns flowOf(null)
 
         sut.save(feeds).test {
             assertEquals(feeds, captureFeed.captured)
             assertEquals(timestamp, captureTimeStamp.captured)
             awaitComplete()
+        }
+
+        verifyOrder {
+            store.deleteCache()
+            store.insert(feeds, timestamp)
         }
 
         verify(exactly = 1) {
