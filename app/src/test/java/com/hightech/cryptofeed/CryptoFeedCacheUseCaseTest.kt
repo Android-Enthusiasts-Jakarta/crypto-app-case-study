@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 import java.util.UUID
 
 class CryptoFeedCacheUseCaseTest {
@@ -25,9 +26,11 @@ class CryptoFeedCacheUseCaseTest {
 
     private val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
 
+    private val timestamp = Date()
+
     @Before
     fun setUp() {
-        sut = CryptoFeedCacheUseCase(store = store)
+        sut = CryptoFeedCacheUseCase(store = store, timestamp)
     }
 
     @Test
@@ -71,7 +74,7 @@ class CryptoFeedCacheUseCaseTest {
         }
 
         verify(exactly = 0) {
-            store.insert(feeds)
+            store.insert(feeds, timestamp)
         }
 
         confirmVerified(store)
@@ -80,13 +83,14 @@ class CryptoFeedCacheUseCaseTest {
     @Test
     fun testSaveRequestsNewCacheInsertionOnSuccessfulDeletion() = runBlocking {
         val captureFeed = slot<List<CryptoFeed>>()
+        val captureTimeStamp = slot<Date>()
 
         every {
             store.deleteCache()
         } returns flowOf(null)
 
         every {
-            store.insert(capture(captureFeed))
+            store.insert(capture(captureFeed), capture(captureTimeStamp))
         } returns flowOf()
 
         sut.save(feeds).test {
@@ -99,7 +103,36 @@ class CryptoFeedCacheUseCaseTest {
         }
 
         verify(exactly = 1) {
-            store.insert(feeds)
+            store.insert(feeds, timestamp)
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
+        val captureFeed = slot<List<CryptoFeed>>()
+        val captureTimeStamp = slot<Date>()
+
+        every {
+            store.deleteCache()
+        } returns flowOf(null)
+
+        every {
+            store.insert(capture(captureFeed), capture(captureTimeStamp))
+        } returns flowOf()
+
+        sut.save(feeds).test {
+            assertEquals(timestamp, captureTimeStamp.captured)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.insert(feeds, timestamp)
         }
 
         confirmVerified(store)
