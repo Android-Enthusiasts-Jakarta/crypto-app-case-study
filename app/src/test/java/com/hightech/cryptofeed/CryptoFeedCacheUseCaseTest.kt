@@ -116,6 +116,28 @@ class CryptoFeedCacheUseCaseTest {
         confirmVerified(store)
     }
 
+    @Test
+    fun testSaveFailsOnDeletionError() = runBlocking {
+        every {
+            store.deleteCache()
+        } returns flowOf(Exception())
+
+        sut.save(feeds).test {
+            assertEquals(Exception()::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 0) {
+            store.insert(feeds, timestamp)
+        }
+
+        confirmVerified(store)
+    }
+
     private fun uniqueCryptoFeed(): CryptoFeed {
         return CryptoFeed(
             CoinInfo(

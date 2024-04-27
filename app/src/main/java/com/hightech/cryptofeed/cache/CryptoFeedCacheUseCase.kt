@@ -19,6 +19,8 @@ class CryptoFeedCacheUseCase constructor(
         store.deleteCache().collect { error ->
             if (error == null) {
                 store.insert(feeds, currentDate)
+            } else {
+                emit(error)
             }
         }
     }
