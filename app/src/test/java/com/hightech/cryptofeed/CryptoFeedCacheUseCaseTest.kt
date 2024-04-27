@@ -81,35 +81,6 @@ class CryptoFeedCacheUseCaseTest {
     }
 
     @Test
-    fun testSaveRequestsNewCacheInsertionOnSuccessfulDeletion() = runBlocking {
-        val captureFeed = slot<List<CryptoFeed>>()
-        val captureTimeStamp = slot<Date>()
-
-        every {
-            store.deleteCache()
-        } returns flowOf(null)
-
-        every {
-            store.insert(capture(captureFeed), capture(captureTimeStamp))
-        } returns flowOf()
-
-        sut.save(feeds).test {
-            assertEquals(feeds, captureFeed.captured)
-            awaitComplete()
-        }
-
-        verify(exactly = 1) {
-            store.deleteCache()
-        }
-
-        verify(exactly = 1) {
-            store.insert(feeds, timestamp)
-        }
-
-        confirmVerified(store)
-    }
-
-    @Test
     fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
         val captureFeed = slot<List<CryptoFeed>>()
         val captureTimeStamp = slot<Date>()
@@ -123,6 +94,7 @@ class CryptoFeedCacheUseCaseTest {
         } returns flowOf()
 
         sut.save(feeds).test {
+            assertEquals(feeds, captureFeed.captured)
             assertEquals(timestamp, captureTimeStamp.captured)
             awaitComplete()
         }
