@@ -16,7 +16,6 @@ import io.mockk.verifyOrder
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -119,81 +118,95 @@ class CacheCryptoFeedUseCaseTest {
     }
 
     @Test
-    fun testSaveFailsOnDeletionError() = runBlocking {
-        every {
-            store.deleteCache()
-        } returns flowOf(Exception())
-
-        sut.save(feeds).test {
-            assertEquals(Exception()::class.java, awaitItem()!!::class.java)
-            awaitComplete()
-        }
-
-        verify(exactly = 1) {
-            store.deleteCache()
-        }
-
-        verify(exactly = 0) {
-            store.insert(feeds, timestamp)
-        }
-
-        confirmVerified(store)
+    fun testSaveFailsOnDeletionError() {
+        expect(
+            sut = sut, expectedError = Exception(), action = {
+                every {
+                    store.deleteCache()
+                } returns flowOf(Exception())
+            },
+            deleteExactly = 1,
+            insertExactly = 0,
+        )
     }
 
     @Test
-    fun testSaveFailsOnInsertionError() = runBlocking {
-        every {
-            store.deleteCache()
-        } returns flowOf(null)
+    fun testSaveFailsOnInsertionError() {
+        expect(
+            sut = sut, expectedError = Exception(), action = {
+                every {
+                    store.deleteCache()
+                } returns flowOf(null)
 
-        every {
-            store.insert(feeds, timestamp)
-        } returns flowOf(Exception())
-
-        sut.save(feeds).test {
-            assertEquals(Exception()::class.java, awaitItem()!!::class.java)
-            awaitComplete()
-        }
-
-        verify(exactly = 1) {
-            store.deleteCache()
-        }
-
-        verify(exactly = 1) {
-            store.insert(feeds, timestamp)
-        }
-
-        confirmVerified(store)
+                every {
+                    store.insert(feeds, timestamp)
+                } returns flowOf(Exception())
+            },
+            ordering = {
+                verifyOrder {
+                    store.deleteCache()
+                    store.insert(feeds, timestamp)
+                }
+            },
+            deleteExactly = 1,
+            insertExactly = 1,
+        )
     }
 
     @Test
-    fun testSaveSucceedsOnSuccessfulCacheInsertion() = runBlocking {
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+    fun testSaveSucceedsOnSuccessfulCacheInsertion() {
+        expect(
+            sut = sut, expectedError = null, action = {
+                every {
+                    store.deleteCache()
+                } returns flowOf(null)
 
-        every {
-            store.deleteCache()
-        } returns flowOf(null)
+                every {
+                    store.insert(feeds, timestamp)
+                } returns flowOf(null)
+            },
+            ordering = {
+                verifyOrder {
+                    store.deleteCache()
+                    store.insert(feeds, timestamp)
+                }
+            },
+            deleteExactly = 1,
+            insertExactly = 1,
+        )
+    }
 
-        every {
-            store.insert(feeds, timestamp)
-        } returns flowOf(null)
+    private fun expect(
+        sut: CacheCryptoFeedUseCase,
+        expectedError: Exception?,
+        action: () -> Unit,
+        ordering: () -> Unit = {},
+        deleteExactly: Int = -1,
+        insertExactly: Int = -1,
+    ) = runBlocking {
+        action()
 
         sut.save(feeds).test {
-            assertNull(awaitItem())
+            if (expectedError != null) {
+                assertEquals(expectedError::class.java, awaitItem()!!::class.java)
+            } else {
+                assertEquals(expectedError, awaitItem())
+            }
             awaitComplete()
         }
 
-        verify(exactly = 1) {
+        ordering()
+
+        verify(exactly = deleteExactly) {
             store.deleteCache()
         }
 
-        verify(exactly = 1) {
+        verify(exactly = insertExactly) {
             store.insert(feeds, timestamp)
         }
 
         confirmVerified(store)
     }
-
 
     private fun uniqueCryptoFeed(): CryptoFeed {
         return CryptoFeed(
