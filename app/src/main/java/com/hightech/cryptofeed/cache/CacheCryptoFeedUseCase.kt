@@ -14,11 +14,11 @@ class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
     private val currentDate: Date
 ) {
-    fun save(feeds: List<CryptoFeed>): Flow<Exception> = flow {
+    fun save(feeds: List<CryptoFeed>): Flow<Exception?> = flow {
         store.deleteCache().collect { deleteError ->
             if (deleteError == null) {
                 store.insert(feeds, currentDate).collect { insertError ->
-                    insertError?.let { emit(it) }
+                    emit(insertError)
                 }
             } else {
                 emit(deleteError)

@@ -124,7 +124,7 @@ class CacheCryptoFeedUseCaseTest {
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
-            assertEquals(Exception()::class.java, awaitItem()::class.java)
+            assertEquals(Exception()::class.java, awaitItem()!!::class.java)
             awaitComplete()
         }
 
@@ -150,7 +150,7 @@ class CacheCryptoFeedUseCaseTest {
         } returns flowOf(Exception())
 
         sut.save(feeds).test {
-            assertEquals(Exception()::class.java, awaitItem()::class.java)
+            assertEquals(Exception()::class.java, awaitItem()!!::class.java)
             awaitComplete()
         }
 
