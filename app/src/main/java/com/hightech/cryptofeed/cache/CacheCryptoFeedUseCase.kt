@@ -3,7 +3,6 @@ package com.hightech.cryptofeed.cache
 import com.hightech.cryptofeed.domain.CryptoFeed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.sql.Timestamp
 import java.util.Date
 
 interface CryptoFeedStore {
@@ -11,7 +10,7 @@ interface CryptoFeedStore {
     fun insert(feeds: List<CryptoFeed>, timestamp: Date): Flow<Exception?>
 }
 
-class CryptoFeedCacheUseCase constructor(
+class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
     private val currentDate: Date
 ) {

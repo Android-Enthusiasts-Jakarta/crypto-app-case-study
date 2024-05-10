@@ -1,7 +1,7 @@
 package com.hightech.cryptofeed
 
 import app.cash.turbine.test
-import com.hightech.cryptofeed.cache.CryptoFeedCacheUseCase
+import com.hightech.cryptofeed.cache.CacheCryptoFeedUseCase
 import com.hightech.cryptofeed.cache.CryptoFeedStore
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
@@ -21,9 +21,9 @@ import org.junit.Test
 import java.util.Date
 import java.util.UUID
 
-class CryptoFeedCacheUseCaseTest {
+class CacheCryptoFeedUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
-    private lateinit var sut: CryptoFeedCacheUseCase
+    private lateinit var sut: CacheCryptoFeedUseCase
 
     private val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
 
@@ -31,7 +31,7 @@ class CryptoFeedCacheUseCaseTest {
 
     @Before
     fun setUp() {
-        sut = CryptoFeedCacheUseCase(store = store, timestamp)
+        sut = CacheCryptoFeedUseCase(store = store, timestamp)
     }
 
     @Test
@@ -93,7 +93,7 @@ class CryptoFeedCacheUseCaseTest {
 
         every {
             store.insert(capture(captureFeed), capture(captureTimeStamp))
-        } returns flowOf(null)
+        } returns flowOf()
 
         sut.save(feeds).test {
             assertEquals(feeds, captureFeed.captured)
