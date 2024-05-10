@@ -16,6 +16,7 @@ import io.mockk.verifyOrder
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -151,6 +152,34 @@ class CacheCryptoFeedUseCaseTest {
 
         sut.save(feeds).test {
             assertEquals(Exception()::class.java, awaitItem()!!::class.java)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.insert(feeds, timestamp)
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testSaveSucceedsOnSuccessfulCacheInsertion() = runBlocking {
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
+        every {
+            store.deleteCache()
+        } returns flowOf(null)
+
+        every {
+            store.insert(feeds, timestamp)
+        } returns flowOf(null)
+
+        sut.save(feeds).test {
+            assertNull(awaitItem())
             awaitComplete()
         }
 
