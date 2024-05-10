@@ -10,11 +10,13 @@ interface CryptoFeedStore {
     fun insert(feeds: List<CryptoFeed>, timestamp: Date): Flow<Exception?>
 }
 
+typealias SaveResult = Exception?
+
 class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
     private val currentDate: Date
 ) {
-    fun save(feeds: List<CryptoFeed>): Flow<Exception?> = flow {
+    fun save(feeds: List<CryptoFeed>): Flow<SaveResult> = flow {
         store.deleteCache().collect { deleteError ->
             if (deleteError != null) {
                 emit(deleteError)

@@ -3,6 +3,7 @@ package com.hightech.cryptofeed
 import app.cash.turbine.test
 import com.hightech.cryptofeed.cache.CacheCryptoFeedUseCase
 import com.hightech.cryptofeed.cache.CryptoFeedStore
+import com.hightech.cryptofeed.cache.SaveResult
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.Raw
@@ -123,7 +124,7 @@ class CacheCryptoFeedUseCaseTest {
             sut = sut, expectedError = Exception(), action = {
                 every {
                     store.deleteCache()
-                } returns flowOf(Exception())
+                } returns flowOf(SaveResult())
             },
             deleteExactly = 1,
             insertExactly = 0,
@@ -140,7 +141,7 @@ class CacheCryptoFeedUseCaseTest {
 
                 every {
                     store.insert(feeds, timestamp)
-                } returns flowOf(Exception())
+                } returns flowOf(SaveResult())
             },
             ordering = {
                 verifyOrder {
