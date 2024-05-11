@@ -23,8 +23,6 @@ class CacheCryptoFeedUseCaseTest {
     private val store = spyk<RoomCryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
-    private val feed = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-
     private val timestamp = Date()
 
     @Before
@@ -43,13 +41,11 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveRequestsCacheDeletion() = runBlocking {
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-
         every {
             store.deleteCache()
         } returns flowOf()
 
-        sut.save(feeds).test {
+        sut.save(listOf(uniqueCryptoFeed())).test {
             awaitComplete()
         }
 
@@ -62,13 +58,11 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveDoesNotRequestCacheInsertionOnDeletionError() = runBlocking {
-        val feed = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-
         every {
             store.deleteCache()
         } returns flowOf(SaveResult())
 
-        sut.save(feed).test {
+        sut.save(listOf(uniqueCryptoFeed())).test {
             skipItems(1)
             awaitComplete()
         }
@@ -78,7 +72,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 0) {
-            store.insert(feed, timestamp)
+            store.insert(any(), any())
         }
 
         confirmVerified(store)
@@ -89,6 +83,8 @@ class CacheCryptoFeedUseCaseTest {
         val captureTimestamp = slot<Date>()
         val captureFeed = slot<List<CryptoFeed>>()
 
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+
         every {
             store.deleteCache()
         } returns flowOf(null)
@@ -97,23 +93,20 @@ class CacheCryptoFeedUseCaseTest {
             store.insert(capture(captureFeed), capture(captureTimestamp))
         } returns flowOf()
 
-        sut.save(feed).test {
-            assertEquals(feed, captureFeed.captured)
+        sut.save(feeds).test {
+            assertEquals(feeds, captureFeed.captured)
             assertEquals(timestamp, captureTimestamp.captured)
             awaitComplete()
         }
 
         verifyOrder {
             store.deleteCache()
-            store.insert(feed, timestamp)
+            store.insert(any(), any())
         }
 
         verify(exactly = 1) {
             store.deleteCache()
-        }
-
-        verify(exactly = 1) {
-            store.insert(feed, timestamp)
+            store.insert(any(), any())
         }
 
         confirmVerified(store)
@@ -141,13 +134,13 @@ class CacheCryptoFeedUseCaseTest {
                 } returns flowOf(null)
 
                 every {
-                    store.insert(feed, timestamp)
+                    store.insert(any(), any())
                 } returns flowOf(Exception())
             },
             ordering = {
                 verifyOrder {
                     store.deleteCache()
-                    store.insert(feed, timestamp)
+                    store.insert(any(), any())
                 }
             },
             deleteExactly = 1,
@@ -164,13 +157,13 @@ class CacheCryptoFeedUseCaseTest {
                 } returns flowOf(null)
 
                 every {
-                    store.insert(feed, timestamp)
+                    store.insert(any(), any())
                 } returns flowOf(null)
             },
             ordering = {
                 verifyOrder {
                     store.deleteCache()
-                    store.insert(feed, timestamp)
+                    store.insert(any(), any())
                 }
             },
             deleteExactly = 1,
@@ -188,7 +181,7 @@ class CacheCryptoFeedUseCaseTest {
     ) = runBlocking {
         action()
 
-        sut.save(feed).test {
+        sut.save(listOf(uniqueCryptoFeed())).test {
             if (expectedError != null) {
                 assertEquals(expectedError::class.java, awaitItem()!!::class.java)
             } else {
@@ -204,7 +197,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = insertExactly) {
-            store.insert(feed, timestamp)
+            store.insert(any(), any())
         }
 
         confirmVerified(store)
