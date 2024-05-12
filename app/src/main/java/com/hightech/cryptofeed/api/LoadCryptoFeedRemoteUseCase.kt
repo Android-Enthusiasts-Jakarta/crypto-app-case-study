@@ -14,13 +14,6 @@ import com.hightech.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class ConnectivityException : Exception()
-class InvalidDataException : Exception()
-class BadRequestException : Exception()
-class NotFoundException : Exception()
-class InternalServerErrorException : Exception()
-class UnexpectedException : Exception()
-
 class LoadCryptoFeedRemoteUseCase constructor(
     private val client: HttpClient
 ) {
