@@ -83,9 +83,25 @@ class CacheCryptoFeedUseCaseTest {
     @Test
     fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
         val captureTimestamp = slot<Date>()
-        val captureFeed = slot<List<CryptoFeed>>()
+        val captureFeed = slot<List<LocalCryptoFeed>>()
 
         val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+        val localCryptoFeeds = feeds.map {
+            LocalCryptoFeed(
+                coinInfo = LocalCoinInfo(
+                    id = it.coinInfo.id,
+                    name = it.coinInfo.name,
+                    fullName = it.coinInfo.fullName,
+                    imageUrl = it.coinInfo.imageUrl
+                ),
+                raw = LocalRaw(
+                    usd = LocalUsd(
+                        price = it.raw.usd.price,
+                        changePctDay = it.raw.usd.changePctDay
+                    )
+                )
+            )
+        }
 
         every {
             store.deleteCache()
@@ -96,7 +112,7 @@ class CacheCryptoFeedUseCaseTest {
         } returns flowOf()
 
         sut.save(feeds).test {
-            assertEquals(feeds, captureFeed.captured)
+            assertEquals(localCryptoFeeds, captureFeed.captured)
             assertEquals(timestamp, captureTimestamp.captured)
             awaitComplete()
         }
