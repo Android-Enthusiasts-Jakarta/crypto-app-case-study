@@ -1,12 +1,6 @@
-package com.hightech.cryptofeed
+package com.hightech.cryptofeed.cache
 
 import app.cash.turbine.test
-import com.hightech.cryptofeed.cache.CacheCryptoFeedUseCase
-import com.hightech.cryptofeed.cache.CryptoFeedStore
-import com.hightech.cryptofeed.cache.LocalCoinInfo
-import com.hightech.cryptofeed.cache.LocalCryptoFeed
-import com.hightech.cryptofeed.cache.LocalRaw
-import com.hightech.cryptofeed.cache.LocalUsd
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.Raw
