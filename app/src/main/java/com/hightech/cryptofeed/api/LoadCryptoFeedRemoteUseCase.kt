@@ -1,9 +1,15 @@
 package com.hightech.cryptofeed.api
 
+import com.hightech.cryptofeed.domain.BadRequest
 import com.hightech.cryptofeed.domain.CoinInfo
+import com.hightech.cryptofeed.domain.Connectivity
 import com.hightech.cryptofeed.domain.CryptoFeed
+import com.hightech.cryptofeed.domain.InternalServerError
+import com.hightech.cryptofeed.domain.InvalidData
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
+import com.hightech.cryptofeed.domain.NotFound
 import com.hightech.cryptofeed.domain.Raw
+import com.hightech.cryptofeed.domain.Unexpected
 import com.hightech.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -74,10 +80,3 @@ private fun List<RemoteCryptoFeed>.toModels(): List<CryptoFeed> {
         )
     }
 }
-
-class Connectivity : Exception()
-class InvalidData : Exception()
-class BadRequest : Exception()
-class NotFound : Exception()
-class InternalServerError : Exception()
-class Unexpected : Exception()
