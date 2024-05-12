@@ -51,7 +51,7 @@ class CacheCryptoFeedUseCaseTest {
             store.deleteCache()
         } returns flowOf()
 
-        sut.save(listOf(uniqueCryptoFeed())).test {
+        sut.save(uniqueItems().first).test {
             awaitComplete()
         }
 
@@ -70,7 +70,7 @@ class CacheCryptoFeedUseCaseTest {
             store.deleteCache()
         } returns flowOf(deletionError)
 
-        sut.save(listOf(uniqueCryptoFeed())).test {
+        sut.save(uniqueItems().first).test {
             skipItems(1)
             awaitComplete()
         }
@@ -91,23 +91,7 @@ class CacheCryptoFeedUseCaseTest {
         val captureFeed = slot<List<LocalCryptoFeed>>()
         val captureTimeStamp = slot<Date>()
 
-        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-        val localCryptoFeeds = feeds.map {
-            LocalCryptoFeed(
-                coinInfo = LocalCoinInfo(
-                    id = it.coinInfo.id,
-                    name = it.coinInfo.name,
-                    fullName = it.coinInfo.fullName,
-                    imageUrl = it.coinInfo.imageUrl
-                ),
-                raw = LocalRaw(
-                    usd = LocalUsd(
-                        price = it.raw.usd.price,
-                        changePctDay = it.raw.usd.changePctDay
-                    )
-                )
-            )
-        }
+        val items = uniqueItems()
 
         every {
             store.deleteCache()
@@ -117,8 +101,8 @@ class CacheCryptoFeedUseCaseTest {
             store.insert(capture(captureFeed), capture(captureTimeStamp))
         } returns flowOf()
 
-        sut.save(feeds).test {
-            assertEquals(localCryptoFeeds, captureFeed.captured)
+        sut.save(items.first).test {
+            assertEquals(items.second, captureFeed.captured)
             assertEquals(timestamp, captureTimeStamp.captured)
             awaitComplete()
         }
@@ -212,7 +196,7 @@ class CacheCryptoFeedUseCaseTest {
     ) = runBlocking {
         action()
 
-        sut.save(listOf(uniqueCryptoFeed())).test {
+        sut.save(uniqueItems().first).test {
             if (expectedError != null) {
                 assertEquals(expectedError::class.java, awaitItem()!!::class.java)
             } else {
@@ -249,6 +233,27 @@ class CacheCryptoFeedUseCaseTest {
                 )
             )
         )
+    }
+
+    private fun uniqueItems(): Pair<List<CryptoFeed>, List<LocalCryptoFeed>> {
+        val cryptoFeeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+        val localCryptoFeeds = cryptoFeeds.map {
+            LocalCryptoFeed(
+                coinInfo = LocalCoinInfo(
+                    id = it.coinInfo.id,
+                    name = it.coinInfo.name,
+                    fullName = it.coinInfo.fullName,
+                    imageUrl = it.coinInfo.imageUrl
+                ),
+                raw = LocalRaw(
+                    usd = LocalUsd(
+                        price = it.raw.usd.price,
+                        changePctDay = it.raw.usd.changePctDay
+                    )
+                )
+            )
+        }
+        return Pair(cryptoFeeds, localCryptoFeeds)
     }
 
     private fun anyException(): Exception {
