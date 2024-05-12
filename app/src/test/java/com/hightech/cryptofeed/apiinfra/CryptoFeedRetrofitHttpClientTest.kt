@@ -1,4 +1,4 @@
-package com.hightech.cryptofeed
+package com.hightech.cryptofeed.apiinfra
 
 import app.cash.turbine.test
 import com.hightech.cryptofeed.api.BadRequestException
@@ -9,9 +9,7 @@ import com.hightech.cryptofeed.api.InvalidDataException
 import com.hightech.cryptofeed.api.NotFoundException
 import com.hightech.cryptofeed.api.RemoteRootCryptoFeed
 import com.hightech.cryptofeed.api.UnexpectedException
-import com.hightech.cryptofeed.apiinfra.CryptoFeedRetrofitHttpClient
-import com.hightech.cryptofeed.apiinfra.CryptoFeedService
-import com.hightech.cryptofeed.apiinfra.RootCryptoFeedResponse
+import com.hightech.cryptofeed.api.remoteCryptoFeed
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
