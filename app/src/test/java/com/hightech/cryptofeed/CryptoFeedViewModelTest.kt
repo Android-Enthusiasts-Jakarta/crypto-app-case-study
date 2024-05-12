@@ -1,14 +1,14 @@
 package com.hightech.cryptofeed
 
 import app.cash.turbine.test
-import com.hightech.cryptofeed.api.BadRequest
-import com.hightech.cryptofeed.api.Connectivity
-import com.hightech.cryptofeed.api.InternalServerError
-import com.hightech.cryptofeed.api.InvalidData
-import com.hightech.cryptofeed.api.NotFound
-import com.hightech.cryptofeed.api.Unexpected
+import com.hightech.cryptofeed.domain.BadRequest
+import com.hightech.cryptofeed.domain.Connectivity
+import com.hightech.cryptofeed.domain.InternalServerError
+import com.hightech.cryptofeed.domain.InvalidData
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.LoadCryptoFeedUseCase
+import com.hightech.cryptofeed.domain.NotFound
+import com.hightech.cryptofeed.domain.Unexpected
 import com.hightech.cryptofeed.presentation.CryptoFeedViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified

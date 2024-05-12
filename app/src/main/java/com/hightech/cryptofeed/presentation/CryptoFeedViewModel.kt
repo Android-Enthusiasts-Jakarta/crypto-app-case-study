@@ -2,14 +2,14 @@ package com.hightech.cryptofeed.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hightech.cryptofeed.api.BadRequest
-import com.hightech.cryptofeed.api.Connectivity
-import com.hightech.cryptofeed.api.InternalServerError
-import com.hightech.cryptofeed.api.InvalidData
-import com.hightech.cryptofeed.api.NotFound
+import com.hightech.cryptofeed.domain.BadRequest
+import com.hightech.cryptofeed.domain.Connectivity
 import com.hightech.cryptofeed.domain.CryptoFeed
+import com.hightech.cryptofeed.domain.InternalServerError
+import com.hightech.cryptofeed.domain.InvalidData
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.LoadCryptoFeedUseCase
+import com.hightech.cryptofeed.domain.NotFound
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
