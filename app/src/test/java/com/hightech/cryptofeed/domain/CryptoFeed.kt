@@ -1,4 +1,4 @@
-package com.hightech.cryptofeed
+package com.hightech.cryptofeed.domain
 
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed

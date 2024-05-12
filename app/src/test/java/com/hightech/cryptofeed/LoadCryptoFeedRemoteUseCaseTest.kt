@@ -20,6 +20,7 @@ import com.hightech.cryptofeed.domain.InvalidData
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.NotFound
 import com.hightech.cryptofeed.domain.Unexpected
+import com.hightech.cryptofeed.domain.cryptoFeed
 import io.mockk.clearAllMocks
 import io.mockk.confirmVerified
 import io.mockk.every

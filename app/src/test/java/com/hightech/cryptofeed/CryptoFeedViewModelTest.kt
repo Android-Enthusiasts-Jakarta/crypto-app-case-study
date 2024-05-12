@@ -9,6 +9,7 @@ import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import com.hightech.cryptofeed.domain.LoadCryptoFeedUseCase
 import com.hightech.cryptofeed.domain.NotFound
 import com.hightech.cryptofeed.domain.Unexpected
+import com.hightech.cryptofeed.domain.cryptoFeed
 import com.hightech.cryptofeed.presentation.CryptoFeedViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
