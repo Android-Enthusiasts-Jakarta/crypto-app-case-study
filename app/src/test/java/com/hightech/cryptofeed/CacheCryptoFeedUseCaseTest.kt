@@ -61,9 +61,11 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveDoestNotRequestsCacheInsertionOnDeletionError() = runBlocking {
+        val deletionError = anyException()
+
         every {
             store.deleteCache()
-        } returns flowOf(Exception())
+        } returns flowOf(deletionError)
 
         sut.save(listOf(uniqueCryptoFeed())).test {
             skipItems(1)
@@ -120,11 +122,13 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveFailsOnDeletionError() {
+        val deletionError = anyException()
+
         expect(
-            sut = sut, expectedError = Exception(), action = {
+            sut = sut, expectedError = deletionError, action = {
                 every {
                     store.deleteCache()
-                } returns flowOf(SaveResult())
+                } returns flowOf(deletionError)
             },
             deleteExactly = 1,
             insertExactly = 0,
@@ -133,15 +137,17 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveFailsOnInsertionError() {
+        val insertionError = anyException()
+
         expect(
-            sut = sut, expectedError = Exception(), action = {
+            sut = sut, expectedError = insertionError, action = {
                 every {
                     store.deleteCache()
                 } returns flowOf(null)
 
                 every {
                     store.insert(any(), any())
-                } returns flowOf(SaveResult())
+                } returns flowOf(insertionError)
             },
             ordering = {
                 verifyOrder {
@@ -224,5 +230,9 @@ class CacheCryptoFeedUseCaseTest {
                 )
             )
         )
+    }
+
+    private fun anyException(): Exception {
+        return Exception()
     }
 }
