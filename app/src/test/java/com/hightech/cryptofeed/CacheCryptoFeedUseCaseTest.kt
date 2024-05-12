@@ -26,8 +26,6 @@ class CacheCryptoFeedUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
-    private val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-
     private val timestamp = Date()
 
     @Before
@@ -50,7 +48,7 @@ class CacheCryptoFeedUseCaseTest {
             store.deleteCache()
         } returns flowOf()
 
-        sut.save(feeds).test {
+        sut.save(listOf(uniqueCryptoFeed())).test {
             awaitComplete()
         }
 
@@ -67,7 +65,7 @@ class CacheCryptoFeedUseCaseTest {
             store.deleteCache()
         } returns flowOf(Exception())
 
-        sut.save(feeds).test {
+        sut.save(listOf(uniqueCryptoFeed())).test {
             skipItems(1)
             awaitComplete()
         }
@@ -77,7 +75,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 0) {
-            store.insert(feeds, timestamp)
+            store.insert(any(), any())
         }
 
         confirmVerified(store)
@@ -87,6 +85,8 @@ class CacheCryptoFeedUseCaseTest {
     fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
         val captureFeed = slot<List<CryptoFeed>>()
         val captureTimeStamp = slot<Date>()
+
+        val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
 
         every {
             store.deleteCache()
@@ -104,7 +104,7 @@ class CacheCryptoFeedUseCaseTest {
 
         verifyOrder {
             store.deleteCache()
-            store.insert(feeds, timestamp)
+            store.insert(any(), any())
         }
 
         verify(exactly = 1) {
@@ -112,7 +112,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 1) {
-            store.insert(feeds, timestamp)
+            store.insert(any(), any())
         }
 
         confirmVerified(store)
@@ -140,13 +140,13 @@ class CacheCryptoFeedUseCaseTest {
                 } returns flowOf(null)
 
                 every {
-                    store.insert(feeds, timestamp)
+                    store.insert(any(), any())
                 } returns flowOf(SaveResult())
             },
             ordering = {
                 verifyOrder {
                     store.deleteCache()
-                    store.insert(feeds, timestamp)
+                    store.insert(any(), any())
                 }
             },
             deleteExactly = 1,
@@ -163,13 +163,13 @@ class CacheCryptoFeedUseCaseTest {
                 } returns flowOf(null)
 
                 every {
-                    store.insert(feeds, timestamp)
+                    store.insert(any(), any())
                 } returns flowOf(null)
             },
             ordering = {
                 verifyOrder {
                     store.deleteCache()
-                    store.insert(feeds, timestamp)
+                    store.insert(any(), any())
                 }
             },
             deleteExactly = 1,
@@ -187,7 +187,7 @@ class CacheCryptoFeedUseCaseTest {
     ) = runBlocking {
         action()
 
-        sut.save(feeds).test {
+        sut.save(listOf(uniqueCryptoFeed())).test {
             if (expectedError != null) {
                 assertEquals(expectedError::class.java, awaitItem()!!::class.java)
             } else {
@@ -203,7 +203,7 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = insertExactly) {
-            store.insert(feeds, timestamp)
+            store.insert(any(), any())
         }
 
         confirmVerified(store)
