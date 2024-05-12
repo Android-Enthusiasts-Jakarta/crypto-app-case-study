@@ -1,12 +1,12 @@
 package com.hightech.cryptofeed
 
-import com.hightech.cryptofeed.apiinfra.CoinInfoResponse
-import com.hightech.cryptofeed.apiinfra.CryptoFeedResponse
-import com.hightech.cryptofeed.apiinfra.RawResponse
 import com.hightech.cryptofeed.api.RemoteCoinInfo
 import com.hightech.cryptofeed.api.RemoteCryptoFeed
 import com.hightech.cryptofeed.api.RemoteRaw
 import com.hightech.cryptofeed.api.RemoteUsd
+import com.hightech.cryptofeed.apiinfra.CoinInfoResponse
+import com.hightech.cryptofeed.apiinfra.CryptoFeedResponse
+import com.hightech.cryptofeed.apiinfra.RawResponse
 import com.hightech.cryptofeed.apiinfra.UsdResponse
 
 val remoteCryptoFeed = listOf(

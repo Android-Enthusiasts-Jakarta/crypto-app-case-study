@@ -3,7 +3,10 @@ package com.hightech.cryptofeed
 import app.cash.turbine.test
 import com.hightech.cryptofeed.cache.CacheCryptoFeedUseCase
 import com.hightech.cryptofeed.cache.CryptoFeedStore
-import com.hightech.cryptofeed.cache.SaveResult
+import com.hightech.cryptofeed.cache.LocalCoinInfo
+import com.hightech.cryptofeed.cache.LocalCryptoFeed
+import com.hightech.cryptofeed.cache.LocalRaw
+import com.hightech.cryptofeed.cache.LocalUsd
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.Raw
@@ -85,10 +88,26 @@ class CacheCryptoFeedUseCaseTest {
 
     @Test
     fun testSaveRequestsNewCacheInsertionWithTimestampOnSuccessfulDeletion() = runBlocking {
-        val captureFeed = slot<List<CryptoFeed>>()
+        val captureFeed = slot<List<LocalCryptoFeed>>()
         val captureTimeStamp = slot<Date>()
 
         val feeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
+        val localCryptoFeeds = feeds.map {
+            LocalCryptoFeed(
+                coinInfo = LocalCoinInfo(
+                    id = it.coinInfo.id,
+                    name = it.coinInfo.name,
+                    fullName = it.coinInfo.fullName,
+                    imageUrl = it.coinInfo.imageUrl
+                ),
+                raw = LocalRaw(
+                    usd = LocalUsd(
+                        price = it.raw.usd.price,
+                        changePctDay = it.raw.usd.changePctDay
+                    )
+                )
+            )
+        }
 
         every {
             store.deleteCache()
@@ -99,7 +118,7 @@ class CacheCryptoFeedUseCaseTest {
         } returns flowOf()
 
         sut.save(feeds).test {
-            assertEquals(feeds, captureFeed.captured)
+            assertEquals(localCryptoFeeds, captureFeed.captured)
             assertEquals(timestamp, captureTimeStamp.captured)
             awaitComplete()
         }
