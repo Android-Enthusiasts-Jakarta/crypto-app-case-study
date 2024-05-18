@@ -231,7 +231,7 @@ class CacheCryptoFeedUseCaseTest {
 
     private fun uniqueItems(): Pair<List<CryptoFeed>, List<LocalCryptoFeed>> {
         val cryptoFeeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-        val localCryptoFeeds = cryptoFeeds.map {
+        val localCryptoFeed = cryptoFeeds.map {
             LocalCryptoFeed(
                 coinInfo = LocalCoinInfo(
                     id = it.coinInfo.id,
@@ -247,7 +247,7 @@ class CacheCryptoFeedUseCaseTest {
                 )
             )
         }
-        return Pair(cryptoFeeds, localCryptoFeeds)
+        return Pair(cryptoFeeds, localCryptoFeed)
     }
 
     private fun anyException(): Exception {
