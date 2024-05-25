@@ -10,10 +10,12 @@ sealed class RetrieveCacheCryptoFeedResult {
     data class Failure(val exception: Exception): RetrieveCacheCryptoFeedResult()
 }
 
+typealias deleteCacheResult = Exception?
+typealias insertResult = Exception?
 typealias RetrievalResult = RetrieveCacheCryptoFeedResult
 
 interface CryptoFeedStore {
-    fun deleteCache(): Flow<Exception?>
-    fun insert(feeds: List<LocalCryptoFeed>, timestamp: Date): Flow<Exception?>
+    fun deleteCache(): Flow<deleteCacheResult>
+    fun insert(feeds: List<LocalCryptoFeed>, timestamp: Date): Flow<insertResult>
     fun retrieve(): Flow<RetrievalResult>
 }
