@@ -1,6 +1,7 @@
 package com.hightech.cryptofeed.cache
 
 import app.cash.turbine.test
+import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -78,27 +79,27 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         confirmVerified(store)
     }
 
-//    @Test
-//    fun testLoadDeliversNoCryptoFeedOnEmptyCache() = runBlocking {
-//        every {
-//            store.retrieve()
-//        } returns flowOf(null)
-//
-//        sut.load().test {
-//            when(val result = awaitItem()) {
-//                is LoadCryptoFeedResult -> {
-//                    assertEquals()
-//                }
-//                else -> {
-//
-//                }
-//            }
-//            awaitComplete()
-//        }
-//        verify(exactly = 1) {
-//            store.retrieve()
-//        }
-//
-//        confirmVerified(store)
-//    }
+    @Test
+    fun testLoadDeliversNoCryptoFeedOnEmptyCache() = runBlocking {
+        every {
+            store.retrieve()
+        } returns flowOf(null)
+
+        sut.load().test {
+            when(val result = awaitItem()) {
+                is LoadCryptoFeedResult.Success -> {
+                    assertEquals(listOf<CryptoFeed>(), result.cryptoFeed)
+                }
+                else -> {
+                    fail("Expected success, got $result instead")
+                }
+            }
+            awaitComplete()
+        }
+        verify(exactly = 1) {
+            store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
 }

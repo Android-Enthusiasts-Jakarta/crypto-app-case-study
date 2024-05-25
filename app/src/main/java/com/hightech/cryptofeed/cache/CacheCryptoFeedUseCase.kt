@@ -29,6 +29,8 @@ class CacheCryptoFeedUseCase constructor(
         store.retrieve().collect { exception ->
             if (exception != null) {
                 emit(LoadCryptoFeedResult.Failure(exception))
+            } else {
+                emit(LoadCryptoFeedResult.Success(emptyList()))
             }
         }
     }
