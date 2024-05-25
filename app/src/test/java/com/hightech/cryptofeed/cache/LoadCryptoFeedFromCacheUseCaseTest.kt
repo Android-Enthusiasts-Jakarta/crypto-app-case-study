@@ -1,8 +1,11 @@
 package com.hightech.cryptofeed.cache
 
+import app.cash.turbine.test
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -22,6 +25,22 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testInitDoesNotLoadCacheUponCreation() = runBlocking {
         verify(exactly = 0) {
+            store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testLoadRequestsCacheRetrieval() = runBlocking {
+        every {
+            store.retrieve()
+        } returns flowOf()
+
+        sut.load().test {
+            awaitComplete()
+        }
+        verify(exactly = 1) {
             store.retrieve()
         }
 

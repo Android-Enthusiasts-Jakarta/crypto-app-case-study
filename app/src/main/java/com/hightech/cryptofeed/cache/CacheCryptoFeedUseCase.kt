@@ -23,6 +23,12 @@ class CacheCryptoFeedUseCase constructor(
         }
     }
 
+    fun load(): Flow<Exception?> = flow {
+        store.retrieve().collect {
+
+        }
+    }
+
     private fun List<CryptoFeed>.toLocal(): List<LocalCryptoFeed> {
         return map {
             LocalCryptoFeed(
