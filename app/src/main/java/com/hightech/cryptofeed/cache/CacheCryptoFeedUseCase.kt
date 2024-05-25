@@ -1,11 +1,13 @@
 package com.hightech.cryptofeed.cache
 
 import com.hightech.cryptofeed.domain.CryptoFeed
+import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.Date
 
 typealias SaveResult = Exception?
+typealias LoadResult = LoadCryptoFeedResult
 
 class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
@@ -23,9 +25,11 @@ class CacheCryptoFeedUseCase constructor(
         }
     }
 
-    fun load(): Flow<Exception?> = flow {
+    fun load(): Flow<LoadResult> = flow {
         store.retrieve().collect { exception ->
-            emit(exception)
+            if (exception != null) {
+                emit(LoadCryptoFeedResult.Failure(exception))
+            }
         }
     }
 

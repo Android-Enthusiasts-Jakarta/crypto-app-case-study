@@ -1,13 +1,16 @@
 package com.hightech.cryptofeed.cache
 
 import app.cash.turbine.test
+import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -57,7 +60,15 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         } returns flowOf(retrievalException)
 
         sut.load().test {
-            assertEquals(retrievalException, awaitItem())
+            when(val result = awaitItem()) {
+                is LoadCryptoFeedResult.Failure -> {
+                    assertEquals(retrievalException, result.exception)
+                }
+                else -> {
+                    fail("Expected failure, got $result instead")
+                }
+            }
+
             awaitComplete()
         }
         verify(exactly = 1) {
@@ -66,4 +77,28 @@ class LoadCryptoFeedFromCacheUseCaseTest {
 
         confirmVerified(store)
     }
+
+//    @Test
+//    fun testLoadDeliversNoCryptoFeedOnEmptyCache() = runBlocking {
+//        every {
+//            store.retrieve()
+//        } returns flowOf(null)
+//
+//        sut.load().test {
+//            when(val result = awaitItem()) {
+//                is LoadCryptoFeedResult -> {
+//                    assertEquals()
+//                }
+//                else -> {
+//
+//                }
+//            }
+//            awaitComplete()
+//        }
+//        verify(exactly = 1) {
+//            store.retrieve()
+//        }
+//
+//        confirmVerified(store)
+//    }
 }
