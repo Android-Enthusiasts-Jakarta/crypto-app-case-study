@@ -7,6 +7,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
@@ -38,6 +39,25 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         } returns flowOf()
 
         sut.load().test {
+            awaitComplete()
+        }
+        verify(exactly = 1) {
+            store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testLoadFailsOnRetrievalError() = runBlocking {
+        val retrievalException = anyException()
+
+        every {
+            store.retrieve()
+        } returns flowOf(retrievalException)
+
+        sut.load().test {
+            assertEquals(retrievalException, awaitItem())
             awaitComplete()
         }
         verify(exactly = 1) {

@@ -24,8 +24,8 @@ class CacheCryptoFeedUseCase constructor(
     }
 
     fun load(): Flow<Exception?> = flow {
-        store.retrieve().collect {
-
+        store.retrieve().collect { exception ->
+            emit(exception)
         }
     }
 
