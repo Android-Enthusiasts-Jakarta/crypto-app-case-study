@@ -51,7 +51,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadFailsOnRetrievalError() = runBlocking {
+    fun testLoadFailsOnRetrievalError() {
         val retrievalException = anyException()
 
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Failure(retrievalException), action = {
@@ -64,7 +64,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadDeliversNoCryptoFeedOnEmptyCache() = runBlocking {
+    fun testLoadDeliversNoCryptoFeedOnEmptyCache() {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
                 store.retrieve()
