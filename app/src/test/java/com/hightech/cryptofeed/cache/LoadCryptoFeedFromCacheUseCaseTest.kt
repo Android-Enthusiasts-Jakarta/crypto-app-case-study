@@ -1,7 +1,6 @@
 package com.hightech.cryptofeed.cache
 
 import app.cash.turbine.test
-import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -9,7 +8,6 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
@@ -56,47 +54,50 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     fun testLoadFailsOnRetrievalError() = runBlocking {
         val retrievalException = anyException()
 
-        every {
-            store.retrieve()
-        } returns flowOf(retrievalException)
-
-        sut.load().test {
-            when(val result = awaitItem()) {
-                is LoadCryptoFeedResult.Failure -> {
-                    assertEquals(retrievalException, result.exception)
-                }
-                else -> {
-                    fail("Expected failure, got $result instead")
-                }
-            }
-
-            awaitComplete()
-        }
-        verify(exactly = 1) {
-            store.retrieve()
-        }
-
-        confirmVerified(store)
+        expect(sut = sut, expectedResult = LoadCryptoFeedResult.Failure(retrievalException), action = {
+            every {
+                store.retrieve()
+            } returns flowOf(retrievalException)
+        },
+            retrieveExactly = 1
+        )
     }
 
     @Test
     fun testLoadDeliversNoCryptoFeedOnEmptyCache() = runBlocking {
-        every {
-            store.retrieve()
-        } returns flowOf(null)
+        expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
+            every {
+                store.retrieve()
+            } returns flowOf(null)
+        },
+            retrieveExactly = 1
+        )
+    }
+
+    private fun expect(
+        sut: CacheCryptoFeedUseCase,
+        expectedResult: LoadResult,
+        action: () -> Unit,
+        retrieveExactly: Int = -1
+    ) = runBlocking {
+        action()
 
         sut.load().test {
-            when(val result = awaitItem()) {
+            when(val receivedResult = awaitItem()) {
                 is LoadCryptoFeedResult.Success -> {
-                    assertEquals(listOf<CryptoFeed>(), result.cryptoFeed)
+                    assertEquals(expectedResult, receivedResult)
+                }
+                is LoadCryptoFeedResult.Failure -> {
+                    assertEquals(expectedResult, receivedResult)
                 }
                 else -> {
-                    fail("Expected success, got $result instead")
+                    fail("Expected result $expectedResult, got $receivedResult instead")
                 }
             }
             awaitComplete()
         }
-        verify(exactly = 1) {
+
+        verify(exactly = retrieveExactly) {
             store.retrieve()
         }
 
