@@ -1,10 +1,6 @@
 package com.hightech.cryptofeed.cache
 
 import app.cash.turbine.test
-import com.hightech.cryptofeed.domain.CoinInfo
-import com.hightech.cryptofeed.domain.CryptoFeed
-import com.hightech.cryptofeed.domain.Raw
-import com.hightech.cryptofeed.domain.Usd
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.slot
@@ -17,7 +13,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.Date
-import java.util.UUID
 
 class CacheCryptoFeedUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
@@ -210,47 +205,5 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         confirmVerified(store)
-    }
-
-    private fun uniqueCryptoFeed(): CryptoFeed {
-        return CryptoFeed(
-            CoinInfo(
-                UUID.randomUUID().toString(),
-                "any",
-                "any",
-                "any-url"
-            ),
-            Raw(
-                Usd(
-                    1.0,
-                    1F,
-                )
-            )
-        )
-    }
-
-    private fun uniqueItems(): Pair<List<CryptoFeed>, List<LocalCryptoFeed>> {
-        val cryptoFeeds = listOf(uniqueCryptoFeed(), uniqueCryptoFeed())
-        val localCryptoFeed = cryptoFeeds.map {
-            LocalCryptoFeed(
-                coinInfo = LocalCoinInfo(
-                    id = it.coinInfo.id,
-                    name = it.coinInfo.name,
-                    fullName = it.coinInfo.fullName,
-                    imageUrl = it.coinInfo.imageUrl
-                ),
-                raw = LocalRaw(
-                    usd = LocalUsd(
-                        price = it.raw.usd.price,
-                        changePctDay = it.raw.usd.changePctDay
-                    )
-                )
-            )
-        }
-        return Pair(cryptoFeeds, localCryptoFeed)
-    }
-
-    private fun anyException(): Exception {
-        return Exception()
     }
 }
