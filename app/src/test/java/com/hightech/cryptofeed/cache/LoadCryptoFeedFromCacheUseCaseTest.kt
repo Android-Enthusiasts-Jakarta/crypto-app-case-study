@@ -12,17 +12,18 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
+import java.util.Calendar
 import java.util.Date
 
 class LoadCryptoFeedFromCacheUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
-    private val timestamp = Date()
+    private val fixedCurrentDate = Date()
 
     @Before
     fun setUp() {
-        sut = CacheCryptoFeedUseCase(store = store, timestamp)
+        sut = CacheCryptoFeedUseCase(store = store, fixedCurrentDate)
     }
 
     @Test
@@ -57,7 +58,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Failure(retrievalException), action = {
             every {
                 store.retrieve()
-            } returns flowOf(retrievalException)
+            } returns flowOf(RetrieveCacheCryptoFeedResult.Failure(retrievalException))
         },
             retrieveExactly = 1
         )
@@ -68,10 +69,22 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
                 store.retrieve()
-            } returns flowOf(null)
+            } returns flowOf(RetrieveCacheCryptoFeedResult.Empty())
         },
             retrieveExactly = 1
         )
+    }
+
+    @Test
+    fun testLoadDeliversCachedCryptoFeedOnLessThanOneDayOldCache() {
+        val cryptoFeed = uniqueItems()
+        val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
+
+        expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(cryptoFeed.first), action = {
+            every {
+                store.retrieve()
+            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.first, lessThanOneDayOldTimestamp))
+        })
     }
 
     private fun expect(
@@ -103,4 +116,14 @@ class LoadCryptoFeedFromCacheUseCaseTest {
 
         confirmVerified(store)
     }
+}
+
+fun Date.adding(days: Int): Date = Calendar.getInstance().apply {
+    time = this@adding
+    add(Calendar.DAY_OF_YEAR, days)
+}.time
+
+fun Date.adding(seconds: Long): Date {
+    val time = this.time + seconds * 1000
+    return Date(time)
 }

@@ -26,11 +26,17 @@ class CacheCryptoFeedUseCase constructor(
     }
 
     fun load(): Flow<LoadResult> = flow {
-        store.retrieve().collect { exception ->
-            if (exception != null) {
-                emit(LoadCryptoFeedResult.Failure(exception))
-            } else {
-                emit(LoadCryptoFeedResult.Success(emptyList()))
+        store.retrieve().collect { result ->
+            when(result) {
+                is RetrieveCacheCryptoFeedResult.Empty -> {
+                    emit(LoadCryptoFeedResult.Success(emptyList()))
+                }
+                is RetrieveCacheCryptoFeedResult.Found -> {
+                    emit(LoadCryptoFeedResult.Success(result.cryptoFeed))
+                }
+                is RetrieveCacheCryptoFeedResult.Failure -> {
+                    emit(LoadCryptoFeedResult.Failure(result.exception))
+                }
             }
         }
     }
