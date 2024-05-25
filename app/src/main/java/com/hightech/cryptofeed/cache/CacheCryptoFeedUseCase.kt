@@ -1,7 +1,10 @@
 package com.hightech.cryptofeed.cache
 
+import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
+import com.hightech.cryptofeed.domain.Raw
+import com.hightech.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.Date
@@ -32,7 +35,7 @@ class CacheCryptoFeedUseCase constructor(
                     emit(LoadCryptoFeedResult.Success(emptyList()))
                 }
                 is RetrieveCacheCryptoFeedResult.Found -> {
-                    emit(LoadCryptoFeedResult.Success(result.cryptoFeed))
+                    emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
                 }
                 is RetrieveCacheCryptoFeedResult.Failure -> {
                     emit(LoadCryptoFeedResult.Failure(result.exception))
@@ -40,23 +43,43 @@ class CacheCryptoFeedUseCase constructor(
             }
         }
     }
+}
 
-    private fun List<CryptoFeed>.toLocal(): List<LocalCryptoFeed> {
-        return map {
-            LocalCryptoFeed(
-                coinInfo = LocalCoinInfo(
-                    id = it.coinInfo.id,
-                    name = it.coinInfo.name,
-                    fullName = it.coinInfo.fullName,
-                    imageUrl = it.coinInfo.imageUrl
-                ),
-                raw = LocalRaw(
-                    usd = LocalUsd(
-                        price = it.raw.usd.price,
-                        changePctDay = it.raw.usd.changePctDay
-                    )
+private fun List<CryptoFeed>.toLocal(): List<LocalCryptoFeed> {
+    return map {
+        LocalCryptoFeed(
+            coinInfo = LocalCoinInfo(
+                id = it.coinInfo.id,
+                name = it.coinInfo.name,
+                fullName = it.coinInfo.fullName,
+                imageUrl = it.coinInfo.imageUrl
+            ),
+            raw = LocalRaw(
+                usd = LocalUsd(
+                    price = it.raw.usd.price,
+                    changePctDay = it.raw.usd.changePctDay
                 )
             )
-        }
+        )
+    }
+}
+
+
+private fun List<LocalCryptoFeed>.toModels(): List<CryptoFeed> {
+    return map {
+        CryptoFeed(
+            coinInfo = CoinInfo(
+                id = it.coinInfo.id,
+                name = it.coinInfo.name,
+                fullName = it.coinInfo.fullName,
+                imageUrl = it.coinInfo.imageUrl
+            ),
+            raw = Raw(
+                usd = Usd(
+                    price = it.raw.usd.price,
+                    changePctDay = it.raw.usd.changePctDay
+                )
+            )
+        )
     }
 }

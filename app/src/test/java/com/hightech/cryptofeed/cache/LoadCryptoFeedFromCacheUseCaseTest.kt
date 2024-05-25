@@ -83,7 +83,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(cryptoFeed.first), action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.first, lessThanOneDayOldTimestamp))
+            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, lessThanOneDayOldTimestamp))
         })
     }
 
