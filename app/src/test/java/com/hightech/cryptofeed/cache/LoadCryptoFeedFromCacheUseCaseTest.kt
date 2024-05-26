@@ -52,19 +52,6 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadFailsOnRetrievalError() {
-        val retrievalException = anyException()
-
-        expect(sut = sut, expectedResult = LoadCryptoFeedResult.Failure(retrievalException), action = {
-            every {
-                store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Failure(retrievalException))
-        },
-            retrieveExactly = 1
-        )
-    }
-
-    @Test
     fun testLoadDeliversNoCryptoFeedOnEmptyCache() {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
@@ -109,6 +96,37 @@ class LoadCryptoFeedFromCacheUseCaseTest {
                 store.retrieve()
             } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, moreThanOneDayOldTimestamp))
         })
+    }
+
+    @Test
+    fun testLoadFailsAndDeletesCacheOnRetrievalError() = runBlocking {
+        val retrievalError= anyException()
+        val expectedResult = LoadCryptoFeedResult.Failure(retrievalError)
+
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCacheCryptoFeedResult.Failure(retrievalError))
+
+        every {
+            store.deleteCache()
+        } returns flowOf(null)
+
+        sut.load().test {
+            when(val receivedResult = awaitItem()) {
+                is LoadCryptoFeedResult.Failure -> {
+                    assertEquals(expectedResult, receivedResult)
+                }
+                else -> {
+                    fail("Expected result $expectedResult, got $receivedResult instead")
+                }
+            }
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.retrieve()
+            store.deleteCache()
+        }
     }
 
     private fun expect(

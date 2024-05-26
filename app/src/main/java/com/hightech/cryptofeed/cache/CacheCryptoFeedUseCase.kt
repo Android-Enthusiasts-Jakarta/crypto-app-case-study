@@ -44,6 +44,7 @@ class CacheCryptoFeedUseCase constructor(
                     }
                 }
                 is RetrieveCacheCryptoFeedResult.Failure -> {
+                    store.deleteCache().collect { _ -> }
                     emit(LoadCryptoFeedResult.Failure(result.exception))
                 }
             }
