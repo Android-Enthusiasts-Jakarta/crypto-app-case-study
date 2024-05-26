@@ -105,7 +105,8 @@ Then the app should display an error message
 1. System delivers no crypto feed.
 
 #### Retrieval Error - Error Course (Sad Path):
-1. System delivers error.
+1. System deletes cache.
+2. System delivers error.
 
 ### Cache Crypto Feed Use Case
 
