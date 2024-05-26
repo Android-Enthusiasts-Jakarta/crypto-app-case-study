@@ -90,12 +90,24 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadDeliversNoCryptoFeedOnOneDayOldCache() {
         val cryptoFeed = uniqueItems()
-        val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
+        val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
 
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, lessThanOneDayOldTimestamp))
+            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+        })
+    }
+
+    @Test
+    fun testLoadDeliversNoCryptoFeedOnMoreThanOneDayOldCache() {
+        val cryptoFeed = uniqueItems()
+        val moreThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
+
+        expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
+            every {
+                store.retrieve()
+            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, moreThanOneDayOldTimestamp))
         })
     }
 
