@@ -15,7 +15,8 @@ typealias LoadResult = LoadCryptoFeedResult
 
 class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
-    private val currentDate: Date
+    private val currentDate: Date,
+    private val calendar: Calendar = Calendar.getInstance()
 ) {
     fun save(feed: List<CryptoFeed>): Flow<SaveResult> = flow {
         store.deleteCache().collect { deleteError ->
@@ -49,10 +50,12 @@ class CacheCryptoFeedUseCase constructor(
         }
     }
 
+    private val maxCacheAgeInDays: Int = 1
+
     private fun validate(timestamp: Date): Boolean {
-        val calendar = Calendar.getInstance().apply {
+        calendar.apply {
             time = timestamp
-            add(Calendar.DAY_OF_YEAR, 1)
+            add(Calendar.DAY_OF_YEAR, maxCacheAgeInDays)
         }
         val maxCacheAge = calendar.time
         return currentDate.before(maxCacheAge)
