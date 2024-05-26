@@ -7,6 +7,7 @@ import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.util.Calendar
 import java.util.Date
 
 typealias SaveResult = Exception?
@@ -35,13 +36,26 @@ class CacheCryptoFeedUseCase constructor(
                     emit(LoadCryptoFeedResult.Success(emptyList()))
                 }
                 is RetrieveCacheCryptoFeedResult.Found -> {
-                    emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
+                    if (validate(result.timestamp)) {
+                        emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
+                    } else {
+                        emit(LoadCryptoFeedResult.Success(emptyList()))
+                    }
                 }
                 is RetrieveCacheCryptoFeedResult.Failure -> {
                     emit(LoadCryptoFeedResult.Failure(result.exception))
                 }
             }
         }
+    }
+
+    private fun validate(timestamp: Date): Boolean {
+        val calendar = Calendar.getInstance().apply {
+            time = timestamp
+            add(Calendar.DAY_OF_YEAR, 1)
+        }
+        val maxCacheAge = calendar.time
+        return currentDate.before(maxCacheAge)
     }
 }
 
