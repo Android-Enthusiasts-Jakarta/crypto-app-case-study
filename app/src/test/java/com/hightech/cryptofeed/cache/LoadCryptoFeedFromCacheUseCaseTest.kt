@@ -140,6 +140,24 @@ class LoadCryptoFeedFromCacheUseCaseTest {
 
         verify(exactly = 1) {
             store.retrieve()
+            store.deleteCache()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testLoadDoesNotDeletesCacheOnEmptyCache() = runBlocking {
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Empty())
+
+        sut.load().test {
+            skipItems(1)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
             store.retrieve()
         }
 
