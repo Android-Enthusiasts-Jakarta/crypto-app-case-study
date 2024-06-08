@@ -3,15 +3,15 @@ package com.hightech.cryptofeed.cache
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
-sealed class RetrieveCacheCryptoFeedResult {
-    class Empty: RetrieveCacheCryptoFeedResult()
-    data class Found(val cryptoFeed: List<LocalCryptoFeed>, val timestamp: Date): RetrieveCacheCryptoFeedResult()
-    data class Failure(val exception: Exception): RetrieveCacheCryptoFeedResult()
+sealed class RetrieveCachedCryptoFeedResult {
+    class Empty: RetrieveCachedCryptoFeedResult()
+    data class Found(val cryptoFeed: List<LocalCryptoFeed>, val timestamp: Date): RetrieveCachedCryptoFeedResult()
+    data class Failure(val exception: Exception): RetrieveCachedCryptoFeedResult()
 }
 
 typealias deleteCacheResult = Exception?
 typealias insertResult = Exception?
-typealias RetrievalResult = RetrieveCacheCryptoFeedResult
+typealias RetrievalResult = RetrieveCachedCryptoFeedResult
 
 interface CryptoFeedStore {
     fun deleteCache(): Flow<deleteCacheResult>

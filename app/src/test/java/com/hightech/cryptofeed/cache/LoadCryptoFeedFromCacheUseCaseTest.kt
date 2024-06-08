@@ -6,6 +6,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
+import io.mockk.verifySequence
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -52,11 +53,28 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
+    fun testLoadFailsOnRetrievalError() {
+        val retrievalError = anyException()
+
+        expect(sut = sut, expectedResult = LoadCryptoFeedResult.Failure(retrievalError), action = {
+            every {
+                store.retrieve()
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Failure(retrievalError))
+
+            every {
+                store.deleteCache()
+            } returns flowOf()
+        },
+            retrieveExactly = 1
+        )
+    }
+
+    @Test
     fun testLoadDeliversNoCryptoFeedOnEmptyCache() {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Empty())
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Empty())
         },
             retrieveExactly = 1
         )
@@ -70,7 +88,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(cryptoFeed.first), action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, lessThanOneDayOldTimestamp))
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, lessThanOneDayOldTimestamp))
         })
     }
 
@@ -82,7 +100,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
         })
     }
 
@@ -94,39 +112,38 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCacheCryptoFeedResult.Found(cryptoFeed.second, moreThanOneDayOldTimestamp))
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, moreThanOneDayOldTimestamp))
         })
     }
 
     @Test
-    fun testLoadFailsAndDeletesCacheOnRetrievalError() = runBlocking {
+    fun testLoadDeletesCacheOnRetrievalError() = runBlocking {
         val retrievalError= anyException()
-        val expectedResult = LoadCryptoFeedResult.Failure(retrievalError)
 
         every {
             store.retrieve()
-        } returns flowOf(RetrieveCacheCryptoFeedResult.Failure(retrievalError))
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Failure(retrievalError))
 
         every {
             store.deleteCache()
-        } returns flowOf(null)
+        } returns flowOf()
 
         sut.load().test {
-            when(val receivedResult = awaitItem()) {
-                is LoadCryptoFeedResult.Failure -> {
-                    assertEquals(expectedResult, receivedResult)
-                }
-                else -> {
-                    fail("Expected result $expectedResult, got $receivedResult instead")
-                }
-            }
+            skipItems(1)
             awaitComplete()
+        }
+
+        verifySequence {
+            store.retrieve()
+            store.deleteCache()
         }
 
         verify(exactly = 1) {
             store.retrieve()
-            store.deleteCache()
+            store.retrieve()
         }
+
+        confirmVerified(store)
     }
 
     private fun expect(
@@ -155,8 +172,6 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         verify(exactly = retrieveExactly) {
             store.retrieve()
         }
-
-        confirmVerified(store)
     }
 }
 

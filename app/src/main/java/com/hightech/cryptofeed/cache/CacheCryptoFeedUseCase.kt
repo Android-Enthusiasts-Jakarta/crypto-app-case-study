@@ -33,17 +33,17 @@ class CacheCryptoFeedUseCase constructor(
     fun load(): Flow<LoadResult> = flow {
         store.retrieve().collect { result ->
             when(result) {
-                is RetrieveCacheCryptoFeedResult.Empty -> {
+                is RetrieveCachedCryptoFeedResult.Empty -> {
                     emit(LoadCryptoFeedResult.Success(emptyList()))
                 }
-                is RetrieveCacheCryptoFeedResult.Found -> {
+                is RetrieveCachedCryptoFeedResult.Found -> {
                     if (validate(result.timestamp)) {
                         emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
                     } else {
                         emit(LoadCryptoFeedResult.Success(emptyList()))
                     }
                 }
-                is RetrieveCacheCryptoFeedResult.Failure -> {
+                is RetrieveCachedCryptoFeedResult.Failure -> {
                     store.deleteCache().collect { _ -> }
                     emit(LoadCryptoFeedResult.Failure(result.exception))
                 }
