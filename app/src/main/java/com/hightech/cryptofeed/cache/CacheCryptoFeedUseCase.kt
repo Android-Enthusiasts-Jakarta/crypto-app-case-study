@@ -40,6 +40,7 @@ class CacheCryptoFeedUseCase constructor(
                     if (validate(result.timestamp)) {
                         emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
                     } else {
+                        store.deleteCache().collect { _ -> }
                         emit(LoadCryptoFeedResult.Success(emptyList()))
                     }
                 }
