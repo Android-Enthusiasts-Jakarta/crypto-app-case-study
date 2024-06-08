@@ -164,6 +164,27 @@ class LoadCryptoFeedFromCacheUseCaseTest {
         confirmVerified(store)
     }
 
+    @Test
+    fun testLoadDoesNotDeleteCacheOnLessThanOneDayOldCache() = runBlocking {
+        val cryptoFeed = uniqueItems()
+        val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
+
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, lessThanOneDayOldTimestamp))
+
+        sut.load().test {
+            skipItems(1)
+            awaitComplete()
+        }
+
+        verify(exactly = 1) {
+            store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
+
     private fun expect(
         sut: CacheCryptoFeedUseCase,
         expectedResult: LoadResult,
