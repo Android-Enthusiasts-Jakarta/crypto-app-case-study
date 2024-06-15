@@ -98,15 +98,26 @@ Then the app should display an error message
 5. System delivers crypto feed.
 
 #### Expired Cache Course (Sad Path):
-1. System deletes cache.
-2. System delivers no crypto feed.
+1. System delivers no crypto feed.
 
 #### Empty Cache Course (Sad Path):
 1. System delivers no crypto feed.
 
 #### Retrieval Error - Error Course (Sad Path):
+1. System delivers error.
+
+### Validate Crypto Feed Cache Use Case
+
+#### Primary Course (Happy Path):
+1. Execute "Validate Cache" command.
+2. System retrieves crypto feed data from cache.
+3. System validates cache is less than one day old.
+
+#### Expired Cache Course (Sad Path):
 1. System deletes cache.
-2. System delivers error.
+
+#### Retrieval Error - Error Course (Sad Path):
+1. System deletes cache.
 
 ### Cache Crypto Feed Use Case
 
