@@ -40,7 +40,6 @@ class CacheCryptoFeedUseCase constructor(
                     if (validate(result.timestamp)) {
                         emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
                     } else {
-                        store.deleteCache().collect { _ -> }
                         emit(LoadCryptoFeedResult.Success(emptyList()))
                     }
                 }
@@ -54,10 +53,17 @@ class CacheCryptoFeedUseCase constructor(
     suspend fun validateCache() {
         store.retrieve().collect { result ->
             when(result) {
+                is RetrieveCachedCryptoFeedResult.Empty -> {}
+
+                is RetrieveCachedCryptoFeedResult.Found -> {
+                    if (!validate(result.timestamp)) {
+                        store.deleteCache().collect { _ -> }
+                    }
+                }
+
                 is RetrieveCachedCryptoFeedResult.Failure -> {
                     store.deleteCache().collect { _ -> }
                 }
-                else -> {}
             }
         }
     }

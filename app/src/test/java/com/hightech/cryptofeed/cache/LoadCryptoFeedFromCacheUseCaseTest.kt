@@ -6,7 +6,6 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
-import io.mockk.verifySequence
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -183,7 +182,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadDeleteCacheOnOneDayOldCache() = runBlocking {
+    fun testLoadHasNoSideEffectsOnOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
 
@@ -191,30 +190,20 @@ class LoadCryptoFeedFromCacheUseCaseTest {
             store.retrieve()
         } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
 
-        every {
-            store.deleteCache()
-        } returns flowOf()
-
         sut.load().test {
             skipItems(1)
             awaitComplete()
         }
 
-        verifySequence {
-            store.retrieve()
-            store.deleteCache()
-        }
-
         verify(exactly = 1) {
             store.retrieve()
-            store.deleteCache()
         }
 
         confirmVerified(store)
     }
 
     @Test
-    fun testLoadDeleteCacheOnMoreThanOneDayOldCache() = runBlocking {
+    fun testLoadHasNoSideEffectsOnMoreThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
 
@@ -222,23 +211,13 @@ class LoadCryptoFeedFromCacheUseCaseTest {
             store.retrieve()
         } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
 
-        every {
-            store.deleteCache()
-        } returns flowOf()
-
         sut.load().test {
             skipItems(1)
             awaitComplete()
         }
 
-        verifySequence {
-            store.retrieve()
-            store.deleteCache()
-        }
-
         verify(exactly = 1) {
             store.retrieve()
-            store.deleteCache()
         }
 
         confirmVerified(store)

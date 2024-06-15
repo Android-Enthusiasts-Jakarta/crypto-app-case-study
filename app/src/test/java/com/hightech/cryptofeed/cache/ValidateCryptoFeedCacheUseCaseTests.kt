@@ -75,7 +75,7 @@ class ValidateCryptoFeedCacheUseCaseTests {
     }
 
     @Test
-    fun testValidateCacheDoesNotDeletesOnLessThanOneDayOldCache() = runBlocking {
+    fun testValidateCacheDoesNotDeletesCacheOnLessThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
         val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
 
@@ -90,6 +90,62 @@ class ValidateCryptoFeedCacheUseCaseTests {
 
         verify(exactly = 1) {
             store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testValidateCacheDeletesCacheOnOneDayOldCache() = runBlocking {
+        val cryptoFeed = uniqueItems()
+        val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
+
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+
+        every {
+            store.deleteCache()
+        } returns flowOf()
+
+        sut.validateCache()
+
+        verifySequence {
+            store.retrieve()
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.retrieve()
+            store.deleteCache()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testValidateCacheDeletesCacheOnMoreThanOneDayOldCache() = runBlocking {
+        val cryptoFeed = uniqueItems()
+        val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
+
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+
+        every {
+            store.deleteCache()
+        } returns flowOf()
+
+        sut.validateCache()
+
+        verifySequence {
+            store.retrieve()
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.retrieve()
+            store.deleteCache()
         }
 
         confirmVerified(store)
