@@ -125,30 +125,20 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadDeletesCacheOnRetrievalError() = runBlocking {
+    fun testLoadHasNoSideEffectsOnRetrievalError() = runBlocking {
         val retrievalError= anyException()
 
         every {
             store.retrieve()
         } returns flowOf(RetrieveCachedCryptoFeedResult.Failure(retrievalError))
 
-        every {
-            store.deleteCache()
-        } returns flowOf()
-
         sut.load().test {
             skipItems(1)
             awaitComplete()
         }
 
-        verifySequence {
-            store.retrieve()
-            store.deleteCache()
-        }
-
         verify(exactly = 1) {
             store.retrieve()
-            store.deleteCache()
         }
 
         confirmVerified(store)

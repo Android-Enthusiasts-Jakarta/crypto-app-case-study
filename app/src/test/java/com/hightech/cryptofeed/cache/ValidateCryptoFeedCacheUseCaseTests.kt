@@ -1,8 +1,12 @@
 package com.hightech.cryptofeed.cache
 
+import app.cash.turbine.test
 import io.mockk.confirmVerified
+import io.mockk.every
 import io.mockk.spyk
 import io.mockk.verify
+import io.mockk.verifySequence
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -23,6 +27,33 @@ class ValidateCryptoFeedCacheUseCaseTests {
     fun testInitDoesNotLoadCacheUponCreation() = runBlocking {
         verify(exactly = 0) {
             store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testValidateCacheDeletesCacheOnRetrievalError() = runBlocking {
+        val retrievalError= anyException()
+
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Failure(retrievalError))
+
+        every {
+            store.deleteCache()
+        } returns flowOf()
+
+        sut.validateCache()
+
+        verifySequence {
+            store.retrieve()
+            store.deleteCache()
+        }
+
+        verify(exactly = 1) {
+            store.retrieve()
+            store.deleteCache()
         }
 
         confirmVerified(store)
