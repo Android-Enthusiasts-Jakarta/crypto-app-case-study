@@ -13,7 +13,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import java.util.Calendar
 import java.util.Date
 
 class LoadCryptoFeedFromCacheUseCaseTest {
@@ -163,7 +162,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadDoesNotDeleteCacheOnLessThanOneDayOldCache() = runBlocking {
+    fun testLoadHasNoSideEffectsOnLessThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
         val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
 
@@ -272,14 +271,4 @@ class LoadCryptoFeedFromCacheUseCaseTest {
             store.retrieve()
         }
     }
-}
-
-fun Date.adding(days: Int): Date = Calendar.getInstance().apply {
-    time = this@adding
-    add(Calendar.DAY_OF_YEAR, days)
-}.time
-
-fun Date.adding(seconds: Long): Date {
-    val time = this.time + seconds * 1000
-    return Date(time)
 }
