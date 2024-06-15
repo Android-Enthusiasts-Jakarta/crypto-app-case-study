@@ -101,6 +101,10 @@ class LoadCryptoFeedFromCacheUseCaseTest {
             every {
                 store.retrieve()
             } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+
+            every {
+                store.deleteCache()
+            } returns flowOf()
         })
     }
 
@@ -113,6 +117,10 @@ class LoadCryptoFeedFromCacheUseCaseTest {
             every {
                 store.retrieve()
             } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, moreThanOneDayOldTimestamp))
+
+            every {
+                store.deleteCache()
+            } returns flowOf()
         })
     }
 
