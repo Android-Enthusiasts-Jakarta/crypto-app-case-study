@@ -3,6 +3,7 @@ package com.hightech.cryptofeed.cache
 import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.LoadCryptoFeedResult
+import com.hightech.cryptofeed.domain.LoadCryptoFeedUseCase
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
     private val currentDate: Date,
     private val calendar: Calendar = Calendar.getInstance()
-) {
+): LoadCryptoFeedUseCase {
     fun save(feed: List<CryptoFeed>): Flow<SaveResult> = flow {
         store.deleteCache().collect { deleteError ->
             if (deleteError != null) {
@@ -30,7 +31,7 @@ class CacheCryptoFeedUseCase constructor(
         }
     }
 
-    fun load(): Flow<LoadResult> = flow {
+    override fun load(): Flow<LoadResult> = flow {
         store.retrieve().collect { result ->
             when(result) {
                 is RetrieveCachedCryptoFeedResult.Empty -> {
