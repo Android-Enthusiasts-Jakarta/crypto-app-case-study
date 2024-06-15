@@ -145,7 +145,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     }
 
     @Test
-    fun testLoadDoesNotDeletesCacheOnEmptyCache() = runBlocking {
+    fun testLoadHasNoSideEffectsOnEmptyCache() = runBlocking {
         every {
             store.retrieve()
         } returns flowOf(RetrieveCachedCryptoFeedResult.Empty())

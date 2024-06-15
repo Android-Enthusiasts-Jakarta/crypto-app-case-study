@@ -58,4 +58,19 @@ class ValidateCryptoFeedCacheUseCaseTests {
 
         confirmVerified(store)
     }
+
+    @Test
+    fun testValidateCacheDoesNotDeletesCacheOnEmptyCache() = runBlocking {
+        every {
+            store.retrieve()
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Empty())
+
+        sut.validateCache()
+
+        verify(exactly = 1) {
+            store.retrieve()
+        }
+
+        confirmVerified(store)
+    }
 }

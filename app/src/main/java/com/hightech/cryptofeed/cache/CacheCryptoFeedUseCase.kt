@@ -52,8 +52,14 @@ class CacheCryptoFeedUseCase constructor(
     }
 
     suspend fun validateCache() {
-        store.retrieve().collect { _ -> }
-        store.deleteCache().collect { _ -> }
+        store.retrieve().collect { result ->
+            when(result) {
+                is RetrieveCachedCryptoFeedResult.Failure -> {
+                    store.deleteCache().collect { _ -> }
+                }
+                else -> {}
+            }
+        }
     }
 
     private val maxCacheAgeInDays: Int = 1
