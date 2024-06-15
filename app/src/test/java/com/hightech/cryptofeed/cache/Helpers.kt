@@ -4,6 +4,8 @@ import com.hightech.cryptofeed.domain.CoinInfo
 import com.hightech.cryptofeed.domain.CryptoFeed
 import com.hightech.cryptofeed.domain.Raw
 import com.hightech.cryptofeed.domain.Usd
+import java.util.Calendar
+import java.util.Date
 import java.util.UUID
 
 fun uniqueCryptoFeed(): CryptoFeed {
@@ -46,4 +48,14 @@ fun uniqueItems(): Pair<List<CryptoFeed>, List<LocalCryptoFeed>> {
 
 fun anyException(): Exception {
     return Exception()
+}
+
+fun Date.adding(days: Int): Date = Calendar.getInstance().apply {
+    time = this@adding
+    add(Calendar.DAY_OF_YEAR, days)
+}.time
+
+fun Date.adding(seconds: Long): Date {
+    val time = this.time + seconds * 1000
+    return Date(time)
 }
