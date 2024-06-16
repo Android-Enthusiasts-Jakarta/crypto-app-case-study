@@ -11,13 +11,31 @@ import kotlinx.coroutines.flow.flow
 import java.util.Calendar
 import java.util.Date
 
+class CryptoFeedCachePolicy constructor(
+    private val currentDate: Date,
+    private val calendar: Calendar = Calendar.getInstance()
+) {
+    private val maxCacheAgeInDays: Int = 1
+
+    fun validate(timestamp: Date): Boolean {
+        calendar.apply {
+            time = timestamp
+            add(Calendar.DAY_OF_YEAR, maxCacheAgeInDays)
+        }
+        val maxCacheAge = calendar.time
+        return currentDate.before(maxCacheAge)
+    }
+}
+
 typealias SaveResult = Exception?
 typealias LoadResult = LoadCryptoFeedResult
 
 class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
     private val currentDate: Date,
-    private val calendar: Calendar = Calendar.getInstance()
+    private val cachePolicy: CryptoFeedCachePolicy = CryptoFeedCachePolicy(
+        currentDate = currentDate
+    )
 ): LoadCryptoFeedUseCase {
     fun save(feed: List<CryptoFeed>): Flow<SaveResult> = flow {
         store.deleteCache().collect { deleteError ->
@@ -38,7 +56,7 @@ class CacheCryptoFeedUseCase constructor(
                     emit(LoadCryptoFeedResult.Success(emptyList()))
                 }
                 is RetrieveCachedCryptoFeedResult.Found -> {
-                    if (validate(result.timestamp)) {
+                    if (cachePolicy.validate(result.timestamp)) {
                         emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
                     } else {
                         emit(LoadCryptoFeedResult.Success(emptyList()))
@@ -57,7 +75,7 @@ class CacheCryptoFeedUseCase constructor(
                 is RetrieveCachedCryptoFeedResult.Empty -> {}
 
                 is RetrieveCachedCryptoFeedResult.Found -> {
-                    if (!validate(result.timestamp)) {
+                    if (!cachePolicy.validate(result.timestamp)) {
                         store.deleteCache().collect { _ -> }
                     }
                 }
@@ -67,17 +85,6 @@ class CacheCryptoFeedUseCase constructor(
                 }
             }
         }
-    }
-
-    private val maxCacheAgeInDays: Int = 1
-
-    private fun validate(timestamp: Date): Boolean {
-        calendar.apply {
-            time = timestamp
-            add(Calendar.DAY_OF_YEAR, maxCacheAgeInDays)
-        }
-        val maxCacheAge = calendar.time
-        return currentDate.before(maxCacheAge)
     }
 }
 
