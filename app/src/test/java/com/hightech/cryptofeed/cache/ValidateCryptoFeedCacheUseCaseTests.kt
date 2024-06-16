@@ -33,30 +33,18 @@ class ValidateCryptoFeedCacheUseCaseTests {
     }
 
     @Test
-    fun testValidateCacheDeletesCacheOnRetrievalError() = runBlocking {
+    fun testValidateCacheDeletesCacheOnRetrievalError() {
         val retrievalError= anyException()
 
-        every {
-            store.retrieve()
-        } returns flowOf(RetrieveCachedCryptoFeedResult.Failure(retrievalError))
+        expect(sut = sut, action = {
+            every {
+                store.retrieve()
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Failure(retrievalError))
 
-        every {
-            store.deleteCache()
-        } returns flowOf()
-
-        sut.validateCache()
-
-        verifySequence {
-            store.retrieve()
-            store.deleteCache()
-        }
-
-        verify(exactly = 1) {
-            store.retrieve()
-            store.deleteCache()
-        }
-
-        confirmVerified(store)
+            every {
+                store.deleteCache()
+            } returns flowOf()
+        })
     }
 
     @Test
@@ -100,27 +88,15 @@ class ValidateCryptoFeedCacheUseCaseTests {
         val cryptoFeed = uniqueItems()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
 
-        every {
-            store.retrieve()
-        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+        expect(sut = sut, action = {
+            every {
+                store.retrieve()
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
 
-        every {
-            store.deleteCache()
-        } returns flowOf()
-
-        sut.validateCache()
-
-        verifySequence {
-            store.retrieve()
-            store.deleteCache()
-        }
-
-        verify(exactly = 1) {
-            store.retrieve()
-            store.deleteCache()
-        }
-
-        confirmVerified(store)
+            every {
+                store.deleteCache()
+            } returns flowOf()
+        })
     }
 
     @Test
@@ -128,13 +104,22 @@ class ValidateCryptoFeedCacheUseCaseTests {
         val cryptoFeed = uniqueItems()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
 
-        every {
-            store.retrieve()
-        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+        expect(sut = sut, action = {
+            every {
+                store.retrieve()
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
 
-        every {
-            store.deleteCache()
-        } returns flowOf()
+            every {
+                store.deleteCache()
+            } returns flowOf()
+        })
+    }
+
+    private fun expect(
+        sut: CacheCryptoFeedUseCase,
+        action: () -> Unit
+    ) = runBlocking {
+        action()
 
         sut.validateCache()
 
