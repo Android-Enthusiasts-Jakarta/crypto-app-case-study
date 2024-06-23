@@ -15,8 +15,7 @@ typealias LoadResult = LoadCryptoFeedResult
 
 class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
-    private val currentDate: () -> Date,
-    private val cachePolicy: CryptoFeedCachePolicy = CryptoFeedCachePolicy()
+    private val currentDate: () -> Date
 ): LoadCryptoFeedUseCase {
     fun save(feed: List<CryptoFeed>): Flow<SaveResult> = flow {
         store.deleteCache().collect { deleteError ->
@@ -37,7 +36,7 @@ class CacheCryptoFeedUseCase constructor(
                     emit(LoadCryptoFeedResult.Success(emptyList()))
                 }
                 is RetrieveCachedCryptoFeedResult.Found -> {
-                    if (cachePolicy.validate(result.timestamp, currentDate())) {
+                    if (CryptoFeedCachePolicy.validate(result.timestamp, currentDate())) {
                         emit(LoadCryptoFeedResult.Success(result.cryptoFeed.toModels()))
                     } else {
                         emit(LoadCryptoFeedResult.Success(emptyList()))
@@ -56,7 +55,7 @@ class CacheCryptoFeedUseCase constructor(
                 is RetrieveCachedCryptoFeedResult.Empty -> {}
 
                 is RetrieveCachedCryptoFeedResult.Found -> {
-                    if (!cachePolicy.validate(result.timestamp, currentDate())) {
+                    if (!CryptoFeedCachePolicy.validate(result.timestamp, currentDate())) {
                         store.deleteCache().collect { _ -> }
                     }
                 }
