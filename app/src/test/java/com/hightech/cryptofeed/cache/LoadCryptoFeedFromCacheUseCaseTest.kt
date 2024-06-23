@@ -18,11 +18,9 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
-    private val fixedCurrentDate = Date()
-
     @Before
     fun setUp() {
-        sut = CacheCryptoFeedUseCase(store = store, fixedCurrentDate)
+        sut = CacheCryptoFeedUseCase(store = store, { Date() })
     }
 
     @Test
@@ -81,6 +79,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadDeliversCachedCryptoFeedOnLessThanOneDayOldCache() {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
 
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(cryptoFeed.first), action = {
@@ -93,6 +92,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadDeliversNoCryptoFeedOnOneDayOldCache() {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
 
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
@@ -109,6 +109,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadDeliversNoCryptoFeedOnMoreThanOneDayOldCache() {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val moreThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
 
         expect(sut = sut, expectedResult = LoadCryptoFeedResult.Success(emptyList()), action = {
@@ -163,6 +164,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadHasNoSideEffectsOnLessThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
 
         every {
@@ -184,6 +186,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadHasNoSideEffectsOnOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
 
         every {
@@ -205,6 +208,7 @@ class LoadCryptoFeedFromCacheUseCaseTest {
     @Test
     fun testLoadHasNoSideEffectsOnMoreThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
 
         every {

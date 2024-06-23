@@ -15,7 +15,7 @@ typealias LoadResult = LoadCryptoFeedResult
 
 class CacheCryptoFeedUseCase constructor(
     private val store: CryptoFeedStore,
-    private val currentDate: Date,
+    private val currentDate: () -> Date,
     private val cachePolicy: CryptoFeedCachePolicy = CryptoFeedCachePolicy(
         currentDate = currentDate
     )
@@ -25,7 +25,7 @@ class CacheCryptoFeedUseCase constructor(
             if (deleteError != null) {
                 emit(deleteError)
             } else {
-                store.insert(feed.toLocal(), currentDate).collect { insertError ->
+                store.insert(feed.toLocal(), currentDate()).collect { insertError ->
                     emit(insertError)
                 }
             }

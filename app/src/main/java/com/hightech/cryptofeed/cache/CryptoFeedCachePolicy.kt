@@ -4,7 +4,7 @@ import java.util.Calendar
 import java.util.Date
 
 class CryptoFeedCachePolicy constructor(
-    private val currentDate: Date,
+    private val currentDate: () -> Date,
     private val calendar: Calendar = Calendar.getInstance()
 ) {
     private val maxCacheAgeInDays: Int = 1
@@ -15,6 +15,6 @@ class CryptoFeedCachePolicy constructor(
             add(Calendar.DAY_OF_YEAR, maxCacheAgeInDays)
         }
         val maxCacheAge = calendar.time
-        return currentDate.before(maxCacheAge)
+        return currentDate().before(maxCacheAge)
     }
 }

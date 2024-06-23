@@ -7,6 +7,7 @@ import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import io.mockk.verifyOrder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -18,11 +19,9 @@ class CacheCryptoFeedUseCaseTest {
     private val store = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
-    private val timestamp = Date()
-
     @Before
     fun setUp() {
-        sut = CacheCryptoFeedUseCase(store = store, timestamp)
+        sut = CacheCryptoFeedUseCase(store = store, { Date() })
     }
 
     @Test
@@ -82,6 +81,8 @@ class CacheCryptoFeedUseCaseTest {
 
         val items = uniqueItems()
 
+        val expectedTimestamp = Date()
+
         every {
             store.deleteCache()
         } returns flowOf(null)
@@ -92,7 +93,7 @@ class CacheCryptoFeedUseCaseTest {
 
         sut.save(items.first).test {
             assertEquals(items.second, captureFeed.captured)
-            assertEquals(timestamp, captureTimeStamp.captured)
+            assertEquals(expectedTimestamp.toString(), captureTimeStamp.captured.toString())
             awaitComplete()
         }
 
@@ -106,6 +107,53 @@ class CacheCryptoFeedUseCaseTest {
         }
 
         verify(exactly = 1) {
+            store.insert(any(), any())
+        }
+
+        confirmVerified(store)
+    }
+
+    @Test
+    fun testSaveTwiceRequestsNewCacheInsertionWithTimestampTwiceOnSuccessfulDeletion() = runBlocking {
+        val captureFeed = slot<List<LocalCryptoFeed>>()
+        val captureTimeStamp = slot<Date>()
+
+        val items = uniqueItems()
+
+        every {
+            store.deleteCache()
+        } returns flowOf(null)
+
+        every {
+            store.insert(capture(captureFeed), capture(captureTimeStamp))
+        } returns flowOf()
+
+        val firstExpectedTimestamp = Date()
+
+        sut.save(items.first).test {
+            assertEquals(items.second, captureFeed.captured)
+            assertEquals(firstExpectedTimestamp.toString(), captureTimeStamp.captured.toString())
+            awaitComplete()
+        }
+
+        val secondExpectedTimestamp = Date()
+
+        sut.save(items.first).test {
+            assertEquals(items.second, captureFeed.captured)
+            assertEquals(secondExpectedTimestamp.toString(), captureTimeStamp.captured.toString())
+            awaitComplete()
+        }
+
+        verifyOrder {
+            store.deleteCache()
+            store.insert(any(), any())
+
+            store.deleteCache()
+            store.insert(any(), any())
+        }
+
+        verify(exactly = 2) {
+            store.deleteCache()
             store.insert(any(), any())
         }
 

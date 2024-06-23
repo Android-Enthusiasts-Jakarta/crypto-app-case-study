@@ -16,11 +16,9 @@ class ValidateCryptoFeedCacheUseCaseTests {
     private val store = spyk<CryptoFeedStore>()
     private lateinit var sut: CacheCryptoFeedUseCase
 
-    private val fixedCurrentDate = Date()
-
     @Before
     fun setUp() {
-        sut = CacheCryptoFeedUseCase(store = store, fixedCurrentDate)
+        sut = CacheCryptoFeedUseCase(store = store, { Date() })
     }
 
     @Test
@@ -65,6 +63,7 @@ class ValidateCryptoFeedCacheUseCaseTests {
     @Test
     fun testValidateCacheDoesNotDeletesCacheOnLessThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
 
         every {
@@ -86,6 +85,7 @@ class ValidateCryptoFeedCacheUseCaseTests {
     @Test
     fun testValidateCacheDeletesCacheOnOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
 
         expect(sut = sut, action = {
@@ -102,6 +102,7 @@ class ValidateCryptoFeedCacheUseCaseTests {
     @Test
     fun testValidateCacheDeletesCacheOnMoreThanOneDayOldCache() = runBlocking {
         val cryptoFeed = uniqueItems()
+        val fixedCurrentDate = Date()
         val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
 
         expect(sut = sut, action = {
