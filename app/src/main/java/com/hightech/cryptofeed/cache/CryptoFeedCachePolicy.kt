@@ -4,17 +4,16 @@ import java.util.Calendar
 import java.util.Date
 
 class CryptoFeedCachePolicy constructor(
-    private val currentDate: () -> Date,
     private val calendar: Calendar = Calendar.getInstance()
 ) {
     private val maxCacheAgeInDays: Int = 1
 
-    fun validate(timestamp: Date): Boolean {
+    fun validate(timestamp: Date, date: Date): Boolean {
         calendar.apply {
             time = timestamp
             add(Calendar.DAY_OF_YEAR, maxCacheAgeInDays)
         }
         val maxCacheAge = calendar.time
-        return currentDate().before(maxCacheAge)
+        return date.before(maxCacheAge)
     }
 }
