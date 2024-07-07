@@ -51,8 +51,10 @@ fun anyException(): Exception {
 }
 
 fun Date.minusCryptoFeedCacheMaxAge(): Date {
-    return adding(days = -1)
+    return adding(days = -cryptoFeedCacheMaxAgeInDays)
 }
+
+private var cryptoFeedCacheMaxAgeInDays = 1
 
 fun Date.adding(days: Int): Date = Calendar.getInstance().apply {
     time = this@adding
