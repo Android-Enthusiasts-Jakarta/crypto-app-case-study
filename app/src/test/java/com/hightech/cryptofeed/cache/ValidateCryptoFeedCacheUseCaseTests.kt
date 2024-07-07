@@ -61,14 +61,14 @@ class ValidateCryptoFeedCacheUseCaseTests {
     }
 
     @Test
-    fun testValidateCacheDoesNotDeletesCacheOnLessThanOneDayOldCache() = runBlocking {
+    fun testValidateCacheDoesNotDeletesCacheOnNonExpiredCache() = runBlocking {
         val cryptoFeed = uniqueItems()
         val fixedCurrentDate = Date()
-        val lessThanOneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = 1)
+        val nonExpiredCacheTimestamp = fixedCurrentDate.minusCryptoFeedCacheMaxAge().adding(seconds = 1)
 
         every {
             store.retrieve()
-        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, lessThanOneDayOldTimestamp))
+        } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, nonExpiredCacheTimestamp))
 
         sut.load().test {
             skipItems(1)
@@ -83,15 +83,15 @@ class ValidateCryptoFeedCacheUseCaseTests {
     }
 
     @Test
-    fun testValidateCacheDeletesCacheOnOneDayOldCache() = runBlocking {
+    fun testValidateCacheDeletesCacheOnCacheExpiration() = runBlocking {
         val cryptoFeed = uniqueItems()
         val fixedCurrentDate = Date()
-        val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1)
+        val expirationTimestamp = fixedCurrentDate.minusCryptoFeedCacheMaxAge()
 
         expect(sut = sut, action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, expirationTimestamp))
 
             every {
                 store.deleteCache()
@@ -100,15 +100,15 @@ class ValidateCryptoFeedCacheUseCaseTests {
     }
 
     @Test
-    fun testValidateCacheDeletesCacheOnMoreThanOneDayOldCache() = runBlocking {
+    fun testValidateCacheDeletesCacheOnExpiredCache() = runBlocking {
         val cryptoFeed = uniqueItems()
         val fixedCurrentDate = Date()
-        val oneDayOldTimestamp = fixedCurrentDate.adding(days = -1).adding(seconds = -1)
+        val expiredCacheTimestamp = fixedCurrentDate.minusCryptoFeedCacheMaxAge().adding(seconds = -1)
 
         expect(sut = sut, action = {
             every {
                 store.retrieve()
-            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, oneDayOldTimestamp))
+            } returns flowOf(RetrieveCachedCryptoFeedResult.Found(cryptoFeed.second, expiredCacheTimestamp))
 
             every {
                 store.deleteCache()

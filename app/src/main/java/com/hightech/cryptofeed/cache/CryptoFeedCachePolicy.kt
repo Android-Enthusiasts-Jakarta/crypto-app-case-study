@@ -3,7 +3,7 @@ package com.hightech.cryptofeed.cache
 import java.util.Calendar
 import java.util.Date
 
-class CryptoFeedCachePolicy private constructor(){
+internal class CryptoFeedCachePolicy private constructor(){
     companion object {
         private val calendar: Calendar = Calendar.getInstance()
 

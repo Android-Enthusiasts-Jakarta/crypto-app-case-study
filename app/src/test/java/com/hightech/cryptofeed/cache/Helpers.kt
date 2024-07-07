@@ -50,6 +50,10 @@ fun anyException(): Exception {
     return Exception()
 }
 
+fun Date.minusCryptoFeedCacheMaxAge(): Date {
+    return adding(days = -1)
+}
+
 fun Date.adding(days: Int): Date = Calendar.getInstance().apply {
     time = this@adding
     add(Calendar.DAY_OF_YEAR, days)
